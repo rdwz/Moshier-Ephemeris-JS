@@ -931,11 +931,7 @@ describe('Ephemeris', () => {
   })
 
   describe('CalculateDailyBody', () => {
-    it('returns an array of ephemerii from start date to end date', () => {
-      // Moon phases
-      // verified https://www.calendar-12.com/moon_calendar/2000/january
-      // feb 1 2000 - mar 1 2000
-      // leap year
+    it('returns an array of ephemeris calculations from start date to end date', () => {
       const results = Ephemeris.CalculateDailyBody({startYear: 2000, startMonth: 1, startDay: 1, endYear: 2000, endMonth: 2, endDay: 1, latitude: 41.37, longitude: -71.1, key: 'moon'})
 
       expect(results.length).toEqual(30)
