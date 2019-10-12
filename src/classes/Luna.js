@@ -10,9 +10,12 @@ import { nutation } from '../utilities/nutation'
 import { util } from '../utilities/util'
 
 export default class Luna {
-  constructor(body, earthBody, observer) {
+  constructor({body, earthBody, observer, quarterApproximationValue=1.5}={}) {
     this.ra = 0.0 /* Right Ascension */
     this.dec = 0.0 /* Declination */
+
+    this.quarterApproximationValue = quarterApproximationValue
+
     this._body = this.calculateBody(body, earthBody, observer)
 
     Object.keys(this._body).forEach(key => {
@@ -23,19 +26,80 @@ export default class Luna {
     this.calcll = this.calcll.bind(this)
   }
 
-  static getPhaseQuarterString(quarterIndex) {
+  static PHASE_0({lang = 'en'}={}) {
+    return "New Moon"
+  }
+
+  static PHASE_1({lang = 'en'}={}) {
+    return "Waxing Crescent"
+  }
+
+  static PHASE_2({lang = 'en'}={}) {
+    return "First Quarter"
+  }
+
+  static PHASE_3({lang = 'en'}={}) {
+    return "Waxing Gibbous"
+  }
+
+  static PHASE_4({lang = 'en'}={}) {
+    return "Full Moon"
+  }
+
+  static PHASE_5({lang = 'en'}={}) {
+    return "Waning Gibbous"
+  }
+
+  static PHASE_6({lang = 'en'}={}) {
+    return "Last Quarter"
+  }
+
+  static PHASE_7({lang = 'en'}={}) {
+    return "Waning Crescent"
+  }
+
+  static GetPhaseQuarterString(quarterIndex) {
     switch(quarterIndex) {
       case 0:
-        return "New Moon"
+        return Luna.PHASE_0()
       case 1:
-        return "First Quarter"
+        return Luna.PHASE_2()
       case 2:
-        return "Full Moon"
+        return Luna.PHASE_4()
       case 3:
-        return "Last Quarter"
+        return Luna.PHASE_6()
       default:
         throw new Error(`Quarter Index: ${quarterIndex} not valid (must be beteen 0 - 3)`)
     }
+  }
+
+  static GetShapeString({illuminatedFraction=0.00}={}) {
+    if (illuminatedFraction >= 0 && illuminatedFraction < 0.5) return "Crescent"
+    if (illuminatedFraction >= 0.5 && illuminatedFraction < 1) return "Gibbous"
+  }
+
+  static GetShapeDirectionString({phaseDecimal=0.00}={}) {
+    if (phaseDecimal >= 0 && phaseDecimal < 0.5) return "Waxing"
+    if (phaseDecimal >= 0.5 && phaseDecimal < 1) return "Waning"
+  }
+
+  static GetWithinQuarterApproximation({phaseDaysBefore=0.00, phaseDaysPast=0.00, halfRangeLength=this.quarterApproximationValue}={}) {
+    return (!!phaseDaysBefore && phaseDaysBefore <= halfRangeLength) || (!!phaseDaysPast && phaseDaysPast <= halfRangeLength)
+  }
+
+  static GetQuarterApproximationString({quarterIndex=0, phaseDaysBefore=0.00, phaseDaysPast=0.00, halfRangeLength=this.quarterApproximationValue}={}) {
+    if (!(!!phaseDaysBefore || !!phaseDaysPast) || (!!phaseDaysBefore && phaseDaysBefore > halfRangeLength) || (!!phaseDaysPast && phaseDaysPast > halfRangeLength)) {
+      return
+    }
+
+    const closestQuarterIndex = (!!phaseDaysBefore && phaseDaysBefore <= halfRangeLength) ? util.mod(quarterIndex + 1, 4) : util.mod(quarterIndex, 4)
+
+    const getVerb = () => {
+      if (!!phaseDaysBefore && phaseDaysBefore <= halfRangeLength) return "Entering"
+      if (!!phaseDaysPast && phaseDaysPast <= halfRangeLength) return "Leaving"
+    }
+
+    return `${getVerb()} ${Luna.GetPhaseQuarterString(closestQuarterIndex)}`
   }
 
   calculateBody(body, earthBody, observer) {
@@ -170,7 +234,10 @@ export default class Luna {
   	x = moonpol[0] - pe[0];
   	x = util.modtp ( x ) * RTD;	/* difference in longitude */
   	i = Math.floor (x/90);	/* number of quarters */
-  	x = (x - i*90.0);	/* phase angle mod 90 degrees */
+    // phaseDecimal - 0.0 - 1.0 float representation of phase.
+    body.position.phaseDecimal = ((x / 360) + 0.5) % 1 // 0-0.24 = New, 0.25 - 0.49 = First Quarter, 0.5 - 0.74 = Full, 0.75 - 0.99 = Last Quarter
+
+    x = (x - i*90.0);	/* phase angle mod 90 degrees */
 
   	/* days per degree of phase angle */
   	z = moonpol[2]/(12.3685 * 0.00257357);
@@ -183,9 +250,28 @@ export default class Luna {
   		body.position.phaseDaysPast = y;
   	}
 
+    body.position.phaseDaysDistance = y
+
     i = (i+2) % 4;
   	body.position.phaseQuarter = i;
-    body.position.phaseQuarterString = Luna.getPhaseQuarterString(i);
+    body.position.phaseQuarterString = Luna.GetPhaseQuarterString(i);
+
+    body.position.shapeString = Luna.GetShapeString({illuminatedFraction: body.position.illuminatedFraction})
+
+    body.position.shapeDirectionString = Luna.GetShapeDirectionString({phaseDecimal: body.position.phaseDecimal})
+
+    body.position.withinQuarterApproximation = Luna.GetWithinQuarterApproximation({
+      quarterIndex: body.position.phaseQuarter,
+      phaseDaysBefore: body.position.phaseDaysBefore,
+      phaseDaysPast: body.position.phaseDaysPast,
+      halfRangeLength: this.quarterApproximationValue
+    })
+    body.position.quarterApproximationString = Luna.GetQuarterApproximationString({
+      quarterIndex: body.position.phaseQuarter,
+      phaseDaysBefore: body.position.phaseDaysBefore,
+      phaseDaysPast: body.position.phaseDaysPast,
+      halfRangeLength: this.quarterApproximationValue
+    })
 
   	body.position.apparent = {
   		dRA: this.ra,

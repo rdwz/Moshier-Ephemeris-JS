@@ -355,3 +355,31 @@ util.angles = function (p, q, e, body) {
 
   return body
 };
+
+util.isInModSetRange = ({setPoint=0, halfRangeLength=0, setMin=0, setMax=1, number=0}={}) => {
+  // Given a point within a wrapping set (between setMin and setMax)
+  // and a halfRangeLength to either side of the point
+  // Returns => boolean if the number
+  //            is within wrapped range
+  //            (setPoint - halfRangeLength)...(setPoint + halfRangeLength)
+  //            example:
+  //            set: 0...1
+  //            setPoint: 0.9
+  //            halfRangeLength: 0.2
+  //            number: 0.05
+  //            returns true => 0.05 is between 0.7...0.1 (wrapped)
+  let low = setPoint - halfRangeLength;
+  let high = setPoint + halfRangeLength - setMax;
+  if (low < setMin) {
+    setPoint -= low;
+    number = (number - low) % setMax;
+  } else if (high > setMin) {
+    setPoint -= high;
+    number = (setMax + number - high) % setMax;
+  }
+
+  return (number >= setPoint - halfRangeLength) && (number < setPoint + halfRangeLength)
+}
+
+// Mods even negative numbers
+util.mod = (x, mod) => (x % mod + mod) % mod

@@ -140,57 +140,169 @@ describe('Ephemeris', () => {
       expect(body.position.nutation.dRA).toEqual(-0.8377353595241296);
     	expect(body.position.nutation.dDec).toEqual(7.884225007355425);
 
+      expect(body.position.phaseDaysBefore).toEqual(undefined);
       expect(body.position.phaseDaysPast).toEqual(2.308172935055592);
+      expect(body.position.phaseDecimal).toEqual(0.8261508732012421);
       expect(body.position.phaseQuarter).toEqual(3);
 
       expect(body.position.sunElongation).toEqual(62.70937512973823);
     })
 
     it ('calculates moon phases', () => {
+      // verified http://astropixels.com/ephemeris/phasescat/phases1901.html
+
+
       let ephemeris = new Ephemeris({...defaultOrigin, day: 1, key: 'moon'})
       let body = ephemeris.moon
+      expect(body.position.shapeDirectionString).toEqual("Waning");
+      expect(body.position.shapeString).toEqual("Crescent");
+      expect(body.position.quarterApproximationString).toEqual(undefined);
+      expect(body.position.withinQuarterApproximation).toEqual(false);
 
-      expect(body.position.phaseQuarter).toEqual(3);
-      expect(body.position.phaseQuarterString).toEqual("Last Quarter");
-      expect(body.position.illuminatedFraction).toEqual(0.2718262029195282);
-      expect(body.position.phaseDaysBefore).toEqual(undefined);
-      expect(body.position.phaseDaysPast).toEqual(2.308172935055592);
+      ephemeris = new Ephemeris({...defaultOrigin, day: 4, hours: 12, key: 'moon'})
+      body = ephemeris.moon
+      expect(body.position.shapeDirectionString).toEqual("Waning");
+      expect(body.position.shapeString).toEqual("Crescent");
+      expect(body.position.quarterApproximationString).toEqual(undefined);
+      expect(body.position.withinQuarterApproximation).toEqual(false);
+
+      ephemeris = new Ephemeris({...defaultOrigin, day: 5, hours: 12, key: 'moon'})
+      body = ephemeris.moon
+      expect(body.position.shapeDirectionString).toEqual("Waning");
+      expect(body.position.shapeString).toEqual("Crescent");
+      expect(body.position.quarterApproximationString).toEqual("Entering New Moon");
+      expect(body.position.withinQuarterApproximation).toEqual(true);
+
+      // New Moon Start Date
+      ephemeris = new Ephemeris({...defaultOrigin, day: 6, hours: 12, key: 'moon'})
+      body = ephemeris.moon
+      expect(body.position.shapeDirectionString).toEqual("Waning");
+      expect(body.position.shapeString).toEqual("Crescent");
+      expect(body.position.quarterApproximationString).toEqual("Entering New Moon");
+      expect(body.position.withinQuarterApproximation).toEqual(true);
+      expect(body.position.illuminatedFraction).toEqual(0.0008920283434496468);
+      expect(body.position.phaseDecimal).toEqual(0.9921094400275815);
 
       ephemeris = new Ephemeris({...defaultOrigin, day: 7, key: 'moon'})
       body = ephemeris.moon
+      expect(body.position.shapeDirectionString).toEqual("Waxing");
+      expect(body.position.shapeString).toEqual("Crescent");
+      expect(body.position.quarterApproximationString).toEqual("Leaving New Moon");
+      expect(body.position.withinQuarterApproximation).toEqual(true);
 
-      expect(body.position.phaseQuarter).toEqual(0);
-      expect(body.position.phaseQuarterString).toEqual("New Moon");
-      expect(body.position.illuminatedFraction).toBeCloseTo(0.0006617445257049992, 14);
-      expect(body.position.phaseDaysBefore).toEqual(undefined);
-      expect(body.position.phaseDaysPast).toBeCloseTo(0.22075147788362653, 14);
+
+      ephemeris = new Ephemeris({...defaultOrigin, day: 12, hours: 12, key: 'moon'})
+      body = ephemeris.moon
+      expect(body.position.shapeDirectionString).toEqual("Waxing");
+      expect(body.position.shapeString).toEqual("Crescent");
+      expect(body.position.quarterApproximationString).toEqual(undefined);
+      expect(body.position.withinQuarterApproximation).toEqual(false);
+
+      ephemeris = new Ephemeris({...defaultOrigin, day: 13, hours: 12, key: 'moon'})
+      body = ephemeris.moon
+      expect(body.position.shapeDirectionString).toEqual("Waxing");
+      expect(body.position.shapeString).toEqual("Crescent");
+      expect(body.position.quarterApproximationString).toEqual("Entering First Quarter");
+      expect(body.position.withinQuarterApproximation).toEqual(true);
+
+
+      // First Quarter Start Date
+      ephemeris = new Ephemeris({...defaultOrigin, day: 14, hours: 12, key: 'moon'})
+      body = ephemeris.moon
+      expect(body.position.shapeDirectionString).toEqual("Waxing");
+      expect(body.position.shapeString).toEqual("Crescent");
+      expect(body.position.quarterApproximationString).toEqual("Entering First Quarter");
+      expect(body.position.withinQuarterApproximation).toEqual(true);
+      expect(body.position.illuminatedFraction).toEqual(0.49395283765805037);
+      expect(body.position.phaseDecimal).toEqual(0.24765648504599658);
 
       ephemeris = new Ephemeris({...defaultOrigin, day: 15, key: 'moon'})
       body = ephemeris.moon
-
       expect(body.position.phaseQuarter).toEqual(1);
-      expect(body.position.phaseQuarterString).toEqual("First Quarter");
-      expect(body.position.illuminatedFraction).toEqual(0.5488689342271671);
-      expect(body.position.phaseDaysBefore).toEqual(undefined);
-      expect(body.position.phaseDaysPast).toEqual(0.4328134799840978);
+      expect(body.position.shapeDirectionString).toEqual("Waxing");
+      expect(body.position.shapeString).toEqual("Gibbous");
+      expect(body.position.quarterApproximationString).toEqual("Leaving First Quarter");
+      expect(body.position.withinQuarterApproximation).toEqual(true);
+
+      ephemeris = new Ephemeris({...defaultOrigin, day: 19, hours: 12, key: 'moon'})
+      body = ephemeris.moon
+      expect(body.position.shapeDirectionString).toEqual("Waxing");
+      expect(body.position.shapeString).toEqual("Gibbous");
+
+
+      ephemeris = new Ephemeris({...defaultOrigin, day: 20, hours: 12, key: 'moon'})
+      body = ephemeris.moon
+      expect(body.position.shapeDirectionString).toEqual("Waxing");
+      expect(body.position.shapeString).toEqual("Gibbous");
+      expect(body.position.quarterApproximationString).toEqual("Entering Full Moon");
+      expect(body.position.withinQuarterApproximation).toEqual(true);
+
+
+      // Full Moon Start Date
+      ephemeris = new Ephemeris({...defaultOrigin, day: 21, hours: 12, key: 'moon'})
+      body = ephemeris.moon
+      expect(body.position.shapeDirectionString).toEqual("Waning");
+      expect(body.position.shapeString).toEqual("Gibbous");
+      expect(body.position.quarterApproximationString).toEqual("Leaving Full Moon");
+      expect(body.position.withinQuarterApproximation).toEqual(true);
+      expect(body.position.phaseDecimal).toEqual(0.5117004706502886);
+      expect(body.position.illuminatedFraction).toEqual(0.9986549777601933);
 
       ephemeris = new Ephemeris({...defaultOrigin, day: 22, key: 'moon'})
       body = ephemeris.moon
+      expect(body.position.shapeDirectionString).toEqual("Waning");
+      expect(body.position.shapeString).toEqual("Gibbous");
+      expect(body.position.quarterApproximationString).toEqual("Leaving Full Moon");
+      expect(body.position.withinQuarterApproximation).toEqual(true);
 
-      expect(body.position.phaseQuarter).toEqual(2);
-      expect(body.position.phaseQuarterString).toEqual("Full Moon");
-      expect(body.position.illuminatedFraction).toBeCloseTo(0.9906443297921943, 14);
-      expect(body.position.phaseDaysBefore).toEqual(undefined);
-      expect(body.position.phaseDaysPast).toBeCloseTo(0.8464007357321963, 14);
+
+      ephemeris = new Ephemeris({...defaultOrigin, day: 23, hours: 12, key: 'moon'})
+      body = ephemeris.moon
+      expect(body.position.shapeDirectionString).toEqual("Waning");
+      expect(body.position.shapeString).toEqual("Gibbous");
+      expect(body.position.quarterApproximationString).toEqual(undefined);
+      expect(body.position.withinQuarterApproximation).toEqual(false);
+
+
+      ephemeris = new Ephemeris({...defaultOrigin, day: 26, hours: 12, key: 'moon'})
+      body = ephemeris.moon
+      expect(body.position.shapeDirectionString).toEqual("Waning");
+      expect(body.position.shapeString).toEqual("Gibbous");
+      expect(body.position.quarterApproximationString).toEqual(undefined);
+      expect(body.position.withinQuarterApproximation).toEqual(false);
+
+      ephemeris = new Ephemeris({...defaultOrigin, day: 27, hours: 12, key: 'moon'})
+      body = ephemeris.moon
+      expect(body.position.shapeDirectionString).toEqual("Waning");
+      expect(body.position.shapeString).toEqual("Gibbous");
+      expect(body.position.quarterApproximationString).toEqual("Entering Last Quarter");
+      expect(body.position.withinQuarterApproximation).toEqual(true);
+
+      // Last Quarter Start Date
+      ephemeris = new Ephemeris({...defaultOrigin, day: 28, hours: 12, key: 'moon'})
+      body = ephemeris.moon
+      expect(body.position.shapeDirectionString).toEqual("Waning");
+      expect(body.position.shapeString).toEqual("Crescent");
+      expect(body.position.quarterApproximationString).toEqual("Leaving Last Quarter");
+      expect(body.position.withinQuarterApproximation).toEqual(true);
+      expect(body.position.illuminatedFraction).toEqual(0.4850211047588134);
+      expect(body.position.phaseDecimal).toEqual(0.7552207435388043);
 
       ephemeris = new Ephemeris({...defaultOrigin, day: 29, key: 'moon'})
       body = ephemeris.moon
+      expect(body.position.shapeDirectionString).toEqual("Waning");
+      expect(body.position.shapeString).toEqual("Crescent");
+      expect(body.position.quarterApproximationString).toEqual("Leaving Last Quarter");
+      expect(body.position.withinQuarterApproximation).toEqual(true);
 
-      expect(body.position.phaseQuarter).toEqual(3);
-      expect(body.position.phaseQuarterString).toEqual("Last Quarter");
-      expect(body.position.illuminatedFraction).toEqual(0.4367005906508668);
-      expect(body.position.phaseDaysBefore).toEqual(undefined);
-      expect(body.position.phaseDaysPast).toEqual(0.626845766795706);
+
+      ephemeris = new Ephemeris({...defaultOrigin, day: 4, hours: 12, key: 'moon'})
+      body = ephemeris.moon
+      expect(body.position.shapeDirectionString).toEqual("Waning");
+      expect(body.position.shapeString).toEqual("Crescent");
+      expect(body.position.quarterApproximationString).toEqual(undefined);
+      expect(body.position.withinQuarterApproximation).toEqual(false);
+
     })
   })
 
@@ -815,6 +927,22 @@ describe('Ephemeris', () => {
     it('returns a single result (sun, moon, venus, jupiter, neptune)', () => {
       const ephemeris = new Ephemeris({...defaultOrigin, key: ['sun', 'moon', 'VENUS', 'jupiter', 'neptune']})
       expect(ephemeris.Results.length).toEqual(5)
+    })
+  })
+
+  describe('CalculateDailyBody', () => {
+    it('returns an array of ephemerii from start date to end date', () => {
+      // Moon phases
+      // verified https://www.calendar-12.com/moon_calendar/2000/january
+      // feb 1 2000 - mar 1 2000
+      // leap year
+      const results = Ephemeris.CalculateDailyBody({startYear: 2000, startMonth: 1, startDay: 1, endYear: 2000, endMonth: 2, endDay: 1, latitude: 41.37, longitude: -71.1, key: 'moon'})
+
+      expect(results.length).toEqual(30)
+      expect(results[6].moon.position.phaseQuarterString).toEqual("New Moon") // Feb 7, 2000
+      expect(results[12].moon.position.phaseQuarterString).toEqual("First Quarter") // Feb 13, 2000
+      expect(results[19].moon.position.phaseQuarterString).toEqual("Full Moon") // Feb 20, 2000
+      expect(results[26].moon.position.phaseQuarterString).toEqual("Last Quarter") // Feb 27, 2000
     })
   })
 })

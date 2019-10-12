@@ -1,5 +1,35 @@
 # Changelog
 
+## **v1.0.1**
+
+##### Fixed
+
+##### Added
+
+- Added observerInstance.Date.dateString property which returns the formatted date string of the observer
+- Added static Ephemeris.CalculateDailyBody method which accepts aa start date, end date, and a body key and then returns an array of Ephemeris instances containing the body's calculated positions from start date to end date.
+- Added new moon position properties:
+
+```
+new Ephemeris: {
+  moon: {
+    position: {
+      phaseDecimal: float // property which returns a 0.0 - 0.99 representation of the phase.
+      phaseDaysDistance: float // positive float indicating distance from closest phase quarter
+      shapeDirectionString: string // 'Waxing' or 'Waning' depending on the phaseDecimal value
+      shapeString: string // 'Crescent' or 'Gibbous' depending on the illuminatedFraction
+      quarterApproximationValue: float // the amount (in days) in either direction of a quarter event to allow for determining the approximate quarter phase. Defaults to 1.5 days in either direction of a quarter event.
+      quarterApproximationString: string // 'Entering' or 'Leaving' QUARTER EVENT<'New Moon', 'First Quarter', 'Full Moon', 'Last Quarter'> determined by the phaseDecimal and quarterApproximationValue
+      withinQuarterApproximation: boolean // true/false determined by whether phaseDecimal is inside of quarterApproximationValue
+    }
+  }
+}
+
+```
+
+
+##### Changed
+
 ## **v1.0.0**
 
 ##### Fixed
