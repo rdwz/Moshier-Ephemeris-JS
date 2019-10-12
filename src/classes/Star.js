@@ -138,7 +138,7 @@ export default class Star {
 
   	/* Correct for proper motion and parallax
   	 */
-  	T = (observer.Date.julian - epoch)/36525.0;
+  	T = util.timeInJulianCenturies(observer.Date.julian)
   	for( i=0; i<3; i++ ) {
   		p[i] = q[i]  +  T * m[i]  -  body.parallax * e[i];
   	}

@@ -1,4 +1,5 @@
 import { STR } from '../constants'
+import { util } from './util'
 
 export default class Epsilon {
   constructor(julianDate) {
@@ -9,7 +10,7 @@ export default class Epsilon {
     this.julianDate = julianDate
 
     this.calcEpsilon = this.calcEpsilon.bind(this)
-    
+
     this.calcEpsilon()
   }
 
@@ -19,7 +20,7 @@ export default class Epsilon {
      */
 
   	var T; // double
-  	T = (this.julianDate - 2451545.0)/36525.0;
+  	T = util.timeInJulianCenturies(this.julianDate)
 
   	/* DE403 values. */
   		T /= 10.0;

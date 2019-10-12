@@ -8,6 +8,7 @@ import { lonlat } from '../utilities/lonlat'
 import { precess } from '../utilities/precess'
 import { nutation } from '../utilities/nutation'
 import { util } from '../utilities/util'
+import { getMeanAscendingNode, getMeanPerigee } from '../utilities/luna'
 
 export default class Luna {
   constructor({body, earthBody, observer, quarterApproximationValue=1.5}={}) {
@@ -22,52 +23,25 @@ export default class Luna {
       this[key] = this._body[key]
     })
 
+    this.orbit = this.calculateOrbit(observer.Date.julian)
+
     this.calculateBody = this.calculateBody.bind(this)
     this.calcll = this.calcll.bind(this)
-  }
-
-  static PHASE_0({lang = 'en'}={}) {
-    return "New Moon"
-  }
-
-  static PHASE_1({lang = 'en'}={}) {
-    return "Waxing Crescent"
-  }
-
-  static PHASE_2({lang = 'en'}={}) {
-    return "First Quarter"
-  }
-
-  static PHASE_3({lang = 'en'}={}) {
-    return "Waxing Gibbous"
-  }
-
-  static PHASE_4({lang = 'en'}={}) {
-    return "Full Moon"
-  }
-
-  static PHASE_5({lang = 'en'}={}) {
-    return "Waning Gibbous"
-  }
-
-  static PHASE_6({lang = 'en'}={}) {
-    return "Last Quarter"
-  }
-
-  static PHASE_7({lang = 'en'}={}) {
-    return "Waning Crescent"
+    this.calculateOrbit = this.calculateOrbit.bind(this)
+    this.calculateMeanAscendingNode = this.calculateMeanAscendingNode.bind(this)
+    this.calculateMeanDescendingNode = this.calculateMeanDescendingNode.bind(this)
   }
 
   static GetPhaseQuarterString(quarterIndex) {
     switch(quarterIndex) {
       case 0:
-        return Luna.PHASE_0()
+        return "New Moon"
       case 1:
-        return Luna.PHASE_2()
+        return "First Quarter"
       case 2:
-        return Luna.PHASE_4()
+        return "Full Moon"
       case 3:
-        return Luna.PHASE_6()
+        return "Last Quarter"
       default:
         throw new Error(`Quarter Index: ${quarterIndex} not valid (must be beteen 0 - 3)`)
     }
@@ -374,5 +348,37 @@ export default class Luna {
   	}
 
   	return result;
+  }
+
+  calculateOrbit(julianDate) {
+    const orbit = {}
+
+    orbit.meanAscendingNode = util.attachApparentLongitudes({}, getMeanAscendingNode(julianDate))
+    orbit.meanDescendingNode = util.attachApparentLongitudes({}, util.mod(orbit.meanAscendingNode.apparentLongitude - 180, 360))
+
+    orbit.meanPerigee = util.attachApparentLongitudes({}, getMeanPerigee(julianDate))
+    orbit.meanApogee = util.attachApparentLongitudes({}, util.mod(orbit.meanPerigee.apparentLongitude - 180, 360))
+
+    return orbit
+  }
+
+  calculateMeanAscendingNode(julianDate) {
+    const meanAscendingNode = {}
+
+    meanAscendingNode.apparentLongitude = getMeanAscendingNode(julianDate)
+    meanAscendingNode.apparentLongitudeString = util.decimalDegreesToDMSString(meanAscendingNode.apparentLongitude)
+    meanAscendingNode.apparentLongitude30String = util.decimalDegreesToDMSString(util.mod(meanAscendingNode.apparentLongitude, 30))
+
+    return meanAscendingNode
+  }
+
+  calculateMeanDescendingNode(ascendingNode) {
+    const meanDescendingNode = {}
+
+    meanDescendingNode.apparentLongitude = util.mod(ascendingNode - 180, 360)
+    meanDescendingNode.apparentLongitudeString = util.decimalDegreesToDMSString(meanDescendingNode.apparentLongitude)
+    meanDescendingNode.apparentLongitude30String = util.decimalDegreesToDMSString(util.mod(meanDescendingNode.apparentLongitude, 30))
+
+    return meanDescendingNode
   }
 }

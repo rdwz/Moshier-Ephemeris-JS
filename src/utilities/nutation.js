@@ -236,7 +236,7 @@ nutation.calclo = (date, nutationObject) => {
 	/* Julian centuries from 2000 January 1.5,
 	 * barycentric dynamical time
 	 */
-	T = (date.julian - 2451545.0) / 36525.0;
+	T = util.timeInJulianCenturies(date.julian)
 	T2 = T * T;
 	T10 = T / 10.0;
 

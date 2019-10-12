@@ -1,14 +1,14 @@
 # Changelog
 
-## **v1.0.1**
+## **v1.1.0**
 
 ##### Fixed
 
 ##### Added
 
-- Added observerInstance.Date.dateString property which returns the formatted date string of the observer
-- Added static Ephemeris.CalculateDailyBody method which accepts aa start date, end date, and a body key and then returns an array of Ephemeris instances containing the body's calculated positions from start date to end date.
-- Added new moon position properties:
+- Added `observerInstance.Date.dateString` property which returns the formatted date string of the observer
+- Added static `Ephemeris.CalculateDailyBody` method which accepts aa start date, end date, and a body key and then returns an array of Ephemeris instances containing the body's calculated positions from start date to end date.
+- Added new moon position properties include phase & shape descriptions and orbit calculations (mean ascending node + mean descending node and mean perigee + mean apogee):
 
 ```
 new Ephemeris: {
@@ -21,6 +21,16 @@ new Ephemeris: {
       quarterApproximationValue: float // the amount (in days) in either direction of a quarter event to allow for determining the approximate quarter phase. Defaults to 1.5 days in either direction of a quarter event.
       quarterApproximationString: string // 'Entering' or 'Leaving' QUARTER EVENT<'New Moon', 'First Quarter', 'Full Moon', 'Last Quarter'> determined by the phaseDecimal and quarterApproximationValue
       withinQuarterApproximation: boolean // true/false determined by whether phaseDecimal is inside of quarterApproximationValue
+    }
+    orbit: {
+      meanAscendingNode: {
+        apparentLongitude: float
+        apparentLongitudeString: string
+        apparentLongitude30String: string
+      },
+      meanDescendingNode: {...},
+      meanPerigee: {...},
+      meanApogee: {...}
     }
   }
 }

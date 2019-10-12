@@ -146,6 +146,20 @@ describe('Ephemeris', () => {
       expect(body.position.phaseQuarter).toEqual(3);
 
       expect(body.position.sunElongation).toEqual(62.70937512973823);
+
+      // *** Orbit ***
+      expect(body.orbit.meanAscendingNode.apparentLongitude).toEqual(125.0710318813816);
+      expect(body.orbit.meanAscendingNode.apparentLongitudeString).toEqual("125°4'16\"");
+
+      expect(body.orbit.meanDescendingNode.apparentLongitude).toEqual(305.0710318813816);
+      expect(body.orbit.meanDescendingNode.apparentLongitudeString).toEqual("305°4'16\"");
+
+      expect(body.orbit.meanPerigee.apparentLongitude).toEqual(83.29754123803912);
+      expect(body.orbit.meanPerigee.apparentLongitudeString).toEqual("83°17'51\"");
+
+      expect(body.orbit.meanApogee.apparentLongitude).toEqual(263.2975412380391);
+      expect(body.orbit.meanApogee.apparentLongitudeString).toEqual("263°17'51\"");
+
     })
 
     it ('calculates moon phases', () => {
