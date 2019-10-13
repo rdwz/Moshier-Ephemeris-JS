@@ -183,7 +183,7 @@ export const meanElements = julianDate => {
 	var x, T, T2; // double
 
 	/* Time variables.  T is in Julian centuries.  */
-	T = (julianDate - 2451545.0) / 36525.0;
+	T = util.timeInJulianCenturies(julianDate)
 	T2 = T * T;
 
 	/* Mean longitudes of planets (Simon et al, 1994)

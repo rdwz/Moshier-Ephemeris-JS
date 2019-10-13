@@ -1,6 +1,6 @@
 import { J2000, STR } from '../constants'
 import Epsilon from './Epsilon'
-
+import { util } from './util'
 
 export const precess = {
 	/* In WILLIAMS and SIMON, Laskar's terms of order higher than t^4
@@ -54,7 +54,7 @@ precess.calc = (R, julianDate, direction) => {
 	/* Each precession angle is specified by a polynomial in
 	 * T = Julian centuries from J2000.0.  See AA page B18.
 	 */
-	T = (julianDate - J2000) / 36525.0;
+	T = util.timeInJulianCenturies(julianDate)
 
 	/* Implementation by elementary rotations using Laskar's expansions.
 	 * First rotate about the x axis from the initial equator

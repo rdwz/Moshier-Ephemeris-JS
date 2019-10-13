@@ -2,6 +2,7 @@ import { J2000, RTD} from '../constants'
 
 import Epsilon from './Epsilon'
 import { nutation } from './nutation'
+import { util } from './util'
 
 export const siderial = {};
 
@@ -27,7 +28,8 @@ siderial.calc = (date, tlong) => {
 	/* Julian centuries from standard epoch J2000.0 */
 	/* T = (jd - J2000)/36525.0; */
 	/* Same but at 0h Universal Time of date */
-	T0 = (jd0 - J2000)/36525.0;
+	// T0 = (jd0 - J2000)/36525.0;
+  T0 = util.timeInJulianCenturies(jd0)
 
 	/* The equation of the equinoxes is the nutation in longitude
 	 * times the cosine of the obliquity of the ecliptic.

@@ -89,6 +89,7 @@ export default class Observer {
     const dateObject = { year: this._year, month: this._month, day: this._day, hours: this._hours, minutes: this._minutes, seconds: this._seconds }
     let date = {}
     date.utc = new Date(Date.UTC(this._year, this._month, this._day, this._hours, this._minutes, this._seconds))
+    date.dateString = date.utc.toDateString()
     date.julian = julian.calcJulianDate({...dateObject, month: dateObject.month + 1}), // month + 1 for formula
     date.j2000 = julian.calcJ2000(date.julian),
     date.b1950 = julian.calcB1950(date.julian),
