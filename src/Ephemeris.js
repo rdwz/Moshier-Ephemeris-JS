@@ -71,35 +71,35 @@ export default class Ephemeris {
     }
   }
 
-  static CalculateDailyBody({startYear=0, startMonth=0, startDay=0, endYear=0, endMonth=0, endDay=0, hours=12, minutes=0, latitude=0.00, longitude=0.00, key=null}={}) {
-    // Returns an array of ephemerii from startDate to endDate for 12pm noon UTC of each day
-    // of the specific body
-    const startDate = new Date(Date.UTC(startYear, startMonth, startDay, hours, minutes, 0))
-    const endDate = new Date(Date.UTC(endYear, endMonth, endDay, hours, minutes, 0))
-    const datesArray = []
-
-    let currentDate = new Date(startDate)
-    while(currentDate <= endDate) {
-      datesArray.push(new Date(currentDate))
-      currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1))
-    }
-
-    const ephemerisArray = datesArray.map(date => {
-      return new Ephemeris(
-        {
-          year: date.getFullYear(),
-          month: date.getMonth(),
-          day: date.getDate(),
-          hours: date.getHours(),
-          minutes: date.getMinutes(),
-          seconds: date.getSeconds(),
-          latitude: latitude,
-          longitude: longitude,
-          key: key
-        }
-      )
-    })
-
-    return ephemerisArray
-  }
+  // static CalculateDailyBody({startYear=0, startMonth=0, startDay=0, endYear=0, endMonth=0, endDay=0, hours=12, minutes=0, latitude=0.00, longitude=0.00, key=null}={}) {
+  //   // Returns an array of ephemerii from startDate to endDate for 12pm noon UTC of each day
+  //   // of the specific body
+  //   const startDate = new Date(Date.UTC(startYear, startMonth, startDay, hours, minutes, 0))
+  //   const endDate = new Date(Date.UTC(endYear, endMonth, endDay, hours, minutes, 0))
+  //   const datesArray = []
+  //
+  //   let currentDate = new Date(startDate)
+  //   while(currentDate <= endDate) {
+  //     datesArray.push(new Date(currentDate))
+  //     currentDate = new Date(currentDate.setDate(currentDate.getDate() + 1))
+  //   }
+  //
+  //   const ephemerisArray = datesArray.map(date => {
+  //     return new Ephemeris(
+  //       {
+  //         year: date.getFullYear(),
+  //         month: date.getMonth(),
+  //         day: date.getDate(),
+  //         hours: date.getHours(),
+  //         minutes: date.getMinutes(),
+  //         seconds: date.getSeconds(),
+  //         latitude: latitude,
+  //         longitude: longitude,
+  //         key: key
+  //       }
+  //     )
+  //   })
+  //
+  //   return ephemerisArray
+  // }
 }

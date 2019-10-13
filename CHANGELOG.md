@@ -7,7 +7,6 @@
 ##### Added
 
 - Added `observerInstance.Date.dateString` property which returns the formatted date string of the observer
-- Added static `Ephemeris.CalculateDailyBody` method which accepts aa start date, end date, and a body key and then returns an array of Ephemeris instances containing the body's calculated positions from start date to end date.
 - Added new moon position properties include phase & shape descriptions and orbit calculations (mean ascending node + mean descending node and mean perigee + mean apogee):
 
 ```
