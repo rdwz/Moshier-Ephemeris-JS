@@ -184,7 +184,9 @@ describe('Ephemeris', () => {
       body = ephemeris.moon
       expect(body.position.shapeDirectionString).toEqual("Waning");
       expect(body.position.shapeString).toEqual("Crescent");
-      expect(body.position.quarterApproximationString).toEqual("Entering New Moon");
+      expect(body.position.quarterApproximationString).toEqual("New Moon");
+      expect(body.position.quarterApproximationDirectionString).toEqual("Entering");
+
       expect(body.position.withinQuarterApproximation).toEqual(true);
 
       // New Moon Start Date
@@ -192,7 +194,8 @@ describe('Ephemeris', () => {
       body = ephemeris.moon
       expect(body.position.shapeDirectionString).toEqual("Waning");
       expect(body.position.shapeString).toEqual("Crescent");
-      expect(body.position.quarterApproximationString).toEqual("Entering New Moon");
+      expect(body.position.quarterApproximationString).toEqual("New Moon");
+      expect(body.position.quarterApproximationDirectionString).toEqual("Entering");
       expect(body.position.withinQuarterApproximation).toEqual(true);
       expect(body.position.illuminatedFraction).toEqual(0.0008920283434496468);
       expect(body.position.phaseDecimal).toEqual(0.9921094400275815);
@@ -201,7 +204,9 @@ describe('Ephemeris', () => {
       body = ephemeris.moon
       expect(body.position.shapeDirectionString).toEqual("Waxing");
       expect(body.position.shapeString).toEqual("Crescent");
-      expect(body.position.quarterApproximationString).toEqual("Leaving New Moon");
+      expect(body.position.quarterApproximationString).toEqual("New Moon");
+      expect(body.position.quarterApproximationDirectionString).toEqual("Leaving");
+
       expect(body.position.withinQuarterApproximation).toEqual(true);
 
 
@@ -216,7 +221,8 @@ describe('Ephemeris', () => {
       body = ephemeris.moon
       expect(body.position.shapeDirectionString).toEqual("Waxing");
       expect(body.position.shapeString).toEqual("Crescent");
-      expect(body.position.quarterApproximationString).toEqual("Entering First Quarter");
+      expect(body.position.quarterApproximationString).toEqual("First Quarter");
+      expect(body.position.quarterApproximationDirectionString).toEqual("Entering");
       expect(body.position.withinQuarterApproximation).toEqual(true);
 
 
@@ -225,7 +231,8 @@ describe('Ephemeris', () => {
       body = ephemeris.moon
       expect(body.position.shapeDirectionString).toEqual("Waxing");
       expect(body.position.shapeString).toEqual("Crescent");
-      expect(body.position.quarterApproximationString).toEqual("Entering First Quarter");
+      expect(body.position.quarterApproximationString).toEqual("First Quarter");
+      expect(body.position.quarterApproximationDirectionString).toEqual("Entering");
       expect(body.position.withinQuarterApproximation).toEqual(true);
       expect(body.position.illuminatedFraction).toEqual(0.49395283765805037);
       expect(body.position.phaseDecimal).toEqual(0.24765648504599658);
@@ -235,7 +242,8 @@ describe('Ephemeris', () => {
       expect(body.position.phaseQuarter).toEqual(1);
       expect(body.position.shapeDirectionString).toEqual("Waxing");
       expect(body.position.shapeString).toEqual("Gibbous");
-      expect(body.position.quarterApproximationString).toEqual("Leaving First Quarter");
+      expect(body.position.quarterApproximationString).toEqual("First Quarter");
+      expect(body.position.quarterApproximationDirectionString).toEqual("Leaving");
       expect(body.position.withinQuarterApproximation).toEqual(true);
 
       ephemeris = new Ephemeris({...defaultOrigin, day: 19, hours: 12, key: 'moon'})
@@ -248,7 +256,8 @@ describe('Ephemeris', () => {
       body = ephemeris.moon
       expect(body.position.shapeDirectionString).toEqual("Waxing");
       expect(body.position.shapeString).toEqual("Gibbous");
-      expect(body.position.quarterApproximationString).toEqual("Entering Full Moon");
+      expect(body.position.quarterApproximationString).toEqual("Full Moon");
+      expect(body.position.quarterApproximationDirectionString).toEqual("Entering");
       expect(body.position.withinQuarterApproximation).toEqual(true);
 
 
@@ -257,7 +266,8 @@ describe('Ephemeris', () => {
       body = ephemeris.moon
       expect(body.position.shapeDirectionString).toEqual("Waning");
       expect(body.position.shapeString).toEqual("Gibbous");
-      expect(body.position.quarterApproximationString).toEqual("Leaving Full Moon");
+      expect(body.position.quarterApproximationString).toEqual("Full Moon");
+      expect(body.position.quarterApproximationDirectionString).toEqual("Leaving");
       expect(body.position.withinQuarterApproximation).toEqual(true);
       expect(body.position.phaseDecimal).toEqual(0.5117004706502886);
       expect(body.position.illuminatedFraction).toEqual(0.9986549777601933);
@@ -266,7 +276,8 @@ describe('Ephemeris', () => {
       body = ephemeris.moon
       expect(body.position.shapeDirectionString).toEqual("Waning");
       expect(body.position.shapeString).toEqual("Gibbous");
-      expect(body.position.quarterApproximationString).toEqual("Leaving Full Moon");
+      expect(body.position.quarterApproximationString).toEqual("Full Moon");
+      expect(body.position.quarterApproximationDirectionString).toEqual("Leaving");
       expect(body.position.withinQuarterApproximation).toEqual(true);
 
 
@@ -289,7 +300,8 @@ describe('Ephemeris', () => {
       body = ephemeris.moon
       expect(body.position.shapeDirectionString).toEqual("Waning");
       expect(body.position.shapeString).toEqual("Gibbous");
-      expect(body.position.quarterApproximationString).toEqual("Entering Last Quarter");
+      expect(body.position.quarterApproximationString).toEqual("Last Quarter");
+      expect(body.position.quarterApproximationDirectionString).toEqual("Entering");
       expect(body.position.withinQuarterApproximation).toEqual(true);
 
       // Last Quarter Start Date
@@ -297,7 +309,8 @@ describe('Ephemeris', () => {
       body = ephemeris.moon
       expect(body.position.shapeDirectionString).toEqual("Waning");
       expect(body.position.shapeString).toEqual("Crescent");
-      expect(body.position.quarterApproximationString).toEqual("Leaving Last Quarter");
+      expect(body.position.quarterApproximationString).toEqual("Last Quarter");
+      expect(body.position.quarterApproximationDirectionString).toEqual("Leaving");
       expect(body.position.withinQuarterApproximation).toEqual(true);
       expect(body.position.illuminatedFraction).toEqual(0.4850211047588134);
       expect(body.position.phaseDecimal).toEqual(0.7552207435388043);
@@ -306,7 +319,8 @@ describe('Ephemeris', () => {
       body = ephemeris.moon
       expect(body.position.shapeDirectionString).toEqual("Waning");
       expect(body.position.shapeString).toEqual("Crescent");
-      expect(body.position.quarterApproximationString).toEqual("Leaving Last Quarter");
+      expect(body.position.quarterApproximationString).toEqual("Last Quarter");
+      expect(body.position.quarterApproximationDirectionString).toEqual("Leaving");
       expect(body.position.withinQuarterApproximation).toEqual(true);
 
 

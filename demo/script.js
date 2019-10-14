@@ -5,6 +5,7 @@ class Demo {
     this.timeInput = document.querySelector('#time')
     this.latitudeInput = document.querySelector('#latitude')
     this.longitudeInput = document.querySelector('#longitude')
+    this.moonTable = document.querySelector('#moon')
 
 
     this.handleSubmit = this.handleSubmit.bind(this)
@@ -38,6 +39,16 @@ class Demo {
     const dmsEl = document.querySelector(`#${result.key}-dms`)
     if (dmsEl) dmsEl.innerHTML = result.position.apparentLongitudeString
   })
+
+  const moonTableEls = this.moonTable.querySelectorAll('tbody td')
+  moonTableEls[0].innerHTML = ephemeris.moon.position.shapeDirectionString
+  moonTableEls[1].innerHTML = ephemeris.moon.position.shapeString
+  moonTableEls[2].innerHTML = ephemeris.moon.position.quarterApproximationString || `${ephemeris.moon.position.shapeDirectionString} ${ephemeris.moon.position.shapeString}`
+  moonTableEls[3].innerHTML = ephemeris.moon.position.quarterApproximationDirectionString
+  moonTableEls[4].innerHTML = ephemeris.moon.position.illuminatedFraction
+  moonTableEls[5].innerHTML = ephemeris.moon.position.phaseDecimal
+
+
 
   }
 }

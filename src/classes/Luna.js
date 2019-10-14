@@ -61,19 +61,19 @@ export default class Luna {
     return (!!phaseDaysBefore && phaseDaysBefore <= halfRangeLength) || (!!phaseDaysPast && phaseDaysPast <= halfRangeLength)
   }
 
-  static GetQuarterApproximationString({quarterIndex=0, phaseDaysBefore=0.00, phaseDaysPast=0.00, halfRangeLength=this.quarterApproximationValue}={}) {
+  static GetQuarterApproximationString({quarterIndex=0, phaseDaysBefore=0.00, phaseDaysPast=0.00, halfRangeLength=1.5}={}) {
     if (!(!!phaseDaysBefore || !!phaseDaysPast) || (!!phaseDaysBefore && phaseDaysBefore > halfRangeLength) || (!!phaseDaysPast && phaseDaysPast > halfRangeLength)) {
       return
     }
 
     const closestQuarterIndex = (!!phaseDaysBefore && phaseDaysBefore <= halfRangeLength) ? util.mod(quarterIndex + 1, 4) : util.mod(quarterIndex, 4)
 
-    const getVerb = () => {
-      if (!!phaseDaysBefore && phaseDaysBefore <= halfRangeLength) return "Entering"
-      if (!!phaseDaysPast && phaseDaysPast <= halfRangeLength) return "Leaving"
-    }
+    return `${Luna.GetPhaseQuarterString(closestQuarterIndex)}`
+  }
 
-    return `${getVerb()} ${Luna.GetPhaseQuarterString(closestQuarterIndex)}`
+  static GetQuarterApproximationDirectionString({phaseDaysBefore=0.00, phaseDaysPast=0.00, halfRangeLength=1.5}={}) {
+    if (!!phaseDaysBefore && phaseDaysBefore <= halfRangeLength) return "Entering"
+    if (!!phaseDaysPast && phaseDaysPast <= halfRangeLength) return "Leaving"    
   }
 
   calculateBody(body, earthBody, observer) {
@@ -242,6 +242,12 @@ export default class Luna {
     })
     body.position.quarterApproximationString = Luna.GetQuarterApproximationString({
       quarterIndex: body.position.phaseQuarter,
+      phaseDaysBefore: body.position.phaseDaysBefore,
+      phaseDaysPast: body.position.phaseDaysPast,
+      halfRangeLength: this.quarterApproximationValue
+    })
+
+    body.position.quarterApproximationDirectionString = Luna.GetQuarterApproximationDirectionString({
       phaseDaysBefore: body.position.phaseDaysBefore,
       phaseDaysPast: body.position.phaseDaysPast,
       halfRangeLength: this.quarterApproximationValue
