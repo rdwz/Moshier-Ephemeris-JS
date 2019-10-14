@@ -17,7 +17,7 @@ describe('Luna', () => {
   })
 
   describe('GetQuarterApproximationString', () => {
-    it('returns boolean if phase is within approximation', () => {
+    it('returns string for the nearest approximate quarter phase', () => {
 
       expect(Luna.GetQuarterApproximationString({quarterIndex: 0, phaseDaysBefore: 2, phaseDaysPast: undefined, halfRangeLength: 1.5 })).toBe(undefined)
 
@@ -25,21 +25,48 @@ describe('Luna', () => {
 
       expect(Luna.GetQuarterApproximationString({quarterIndex: 0, phaseDaysBefore: undefined, phaseDaysPast: undefined, halfRangeLength: 1.5 })).toBe(undefined)
 
-      expect(Luna.GetQuarterApproximationString({quarterIndex: 0, phaseDaysBefore: 1, phaseDaysPast: 0, halfRangeLength: 1.5 })).toBe("Entering First Quarter")
+      expect(Luna.GetQuarterApproximationString({quarterIndex: 0, phaseDaysBefore: 1, phaseDaysPast: 0, halfRangeLength: 1.5 })).toBe("First Quarter")
 
-      expect(Luna.GetQuarterApproximationString({quarterIndex: 1, phaseDaysBefore: undefined, phaseDaysPast: 1, halfRangeLength: 1.5 })).toBe("Leaving First Quarter")
+      expect(Luna.GetQuarterApproximationString({quarterIndex: 1, phaseDaysBefore: undefined, phaseDaysPast: 1, halfRangeLength: 1.5 })).toBe("First Quarter")
 
-      expect(Luna.GetQuarterApproximationString({quarterIndex: 1, phaseDaysBefore: 1, phaseDaysPast: 0, halfRangeLength: 1.5 })).toBe("Entering Full Moon")
+      expect(Luna.GetQuarterApproximationString({quarterIndex: 1, phaseDaysBefore: 1, phaseDaysPast: 0, halfRangeLength: 1.5 })).toBe("Full Moon")
 
-      expect(Luna.GetQuarterApproximationString({quarterIndex: 2, phaseDaysBefore: undefined, phaseDaysPast: 1, halfRangeLength: 1.5 })).toBe("Leaving Full Moon")
+      expect(Luna.GetQuarterApproximationString({quarterIndex: 2, phaseDaysBefore: undefined, phaseDaysPast: 1, halfRangeLength: 1.5 })).toBe("Full Moon")
 
-      expect(Luna.GetQuarterApproximationString({quarterIndex: 2, phaseDaysBefore: 1, phaseDaysPast: 0, halfRangeLength: 1.5 })).toBe("Entering Last Quarter")
+      expect(Luna.GetQuarterApproximationString({quarterIndex: 2, phaseDaysBefore: 1, phaseDaysPast: 0, halfRangeLength: 1.5 })).toBe("Last Quarter")
 
-      expect(Luna.GetQuarterApproximationString({quarterIndex: 3, phaseDaysBefore: undefined, phaseDaysPast: 1, halfRangeLength: 1.5 })).toBe("Leaving Last Quarter")
+      expect(Luna.GetQuarterApproximationString({quarterIndex: 3, phaseDaysBefore: undefined, phaseDaysPast: 1, halfRangeLength: 1.5 })).toBe("Last Quarter")
 
-      expect(Luna.GetQuarterApproximationString({quarterIndex: 3, phaseDaysBefore: 1, phaseDaysPast: 0, halfRangeLength: 1.5 })).toBe("Entering New Moon")
+      expect(Luna.GetQuarterApproximationString({quarterIndex: 3, phaseDaysBefore: 1, phaseDaysPast: 0, halfRangeLength: 1.5 })).toBe("New Moon")
 
-      expect(Luna.GetQuarterApproximationString({quarterIndex: 0, phaseDaysBefore: undefined, phaseDaysPast: 1, halfRangeLength: 1.5 })).toBe("Leaving New Moon")
+      expect(Luna.GetQuarterApproximationString({quarterIndex: 0, phaseDaysBefore: undefined, phaseDaysPast: 1, halfRangeLength: 1.5 })).toBe("New Moon")
+    })
+  })
+
+  describe('GetQuarterApproximationString', () => {
+    it('returns string for the direction moon is heading to / from nearest quarter approximation', () => {
+
+      expect(Luna.GetQuarterApproximationDirectionString({phaseDaysBefore: 2, phaseDaysPast: undefined, halfRangeLength: 1.5 })).toBe(undefined)
+
+      expect(Luna.GetQuarterApproximationDirectionString({phaseDaysBefore: undefined, phaseDaysPast: 2, halfRangeLength: 1.5 })).toBe(undefined)
+
+      expect(Luna.GetQuarterApproximationDirectionString({phaseDaysBefore: undefined, phaseDaysPast: undefined, halfRangeLength: 1.5 })).toBe(undefined)
+
+      expect(Luna.GetQuarterApproximationDirectionString({phaseDaysBefore: 1, phaseDaysPast: 0, halfRangeLength: 1.5 })).toBe("Entering")
+
+      expect(Luna.GetQuarterApproximationDirectionString({phaseDaysBefore: undefined, phaseDaysPast: 1, halfRangeLength: 1.5 })).toBe("Leaving")
+
+      expect(Luna.GetQuarterApproximationDirectionString({phaseDaysBefore: 1, phaseDaysPast: 0, halfRangeLength: 1.5 })).toBe("Entering")
+
+      expect(Luna.GetQuarterApproximationDirectionString({phaseDaysBefore: undefined, phaseDaysPast: 1, halfRangeLength: 1.5 })).toBe("Leaving")
+
+      expect(Luna.GetQuarterApproximationDirectionString({phaseDaysBefore: 1, phaseDaysPast: 0, halfRangeLength: 1.5 })).toBe("Entering")
+
+      expect(Luna.GetQuarterApproximationDirectionString({phaseDaysBefore: undefined, phaseDaysPast: 1, halfRangeLength: 1.5 })).toBe("Leaving")
+
+      expect(Luna.GetQuarterApproximationDirectionString({phaseDaysBefore: 1, phaseDaysPast: 0, halfRangeLength: 1.5 })).toBe("Entering")
+
+      expect(Luna.GetQuarterApproximationDirectionString({phaseDaysBefore: undefined, phaseDaysPast: 1, halfRangeLength: 1.5 })).toBe("Leaving")
 
     })
   })

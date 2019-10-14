@@ -142,24 +142,25 @@ ephemeris.mercury
       }
       dLocalApparentSiderialTime: 0.5064527239416776,
       diurnalAberation: {
-        ra: 4.7965251351249245, dec: -0.4299743725608752, dRA: -0.007210078050044472, dDec: -0.09119535940094521
+        ...
       },
       diurnalParallax: {
-        ra: 4.796502712347188, dec: -0.42998832257864683, dRA: -0.3083384338139288, dDec: -2.877388508875992
+        ...
       },
-      localApparentSiderialTime: {hours: 1, minutes: 56, seconds: 4, milliseconds: 225},
+      localApparentSiderialTime: {...},
       topocentric: {
-        altitude: -33.71884921853349, azimuth: 265.4081776827269, ra: -1.4866825948323983, dec: -0.42998832257864716, dRA: {…}
+        ...
       },
       transit: {
-        approxLocalMeridian: {…}, UTdate: 0.6813053006006518, dApproxRiseUT: 3.1070972173980613, dApproxSetUT: 5.454150456008398, approxRiseUT: {…}
+        ...
       }
     },
     apparent: {
-      dRA: 4.796525659456597, dDec: -0.42997393043329624, ra: {…}, dec: {…}
+      ...
     },
     apparentGeocentric: {
-      0: 4.788870432436304, 1: -0.02220591955722075, 2: 1.4339905077136768, 3: {…}, 4: {…}},
+    ...
+    },
     apparentLongitude: 274.38206441358966,
     apparentLongitude30String: "4°22'55"",
     apparentLongitudeString: "274°22'55"",
@@ -167,12 +168,12 @@ ephemeris.mercury
       magnitude: -1.281820354968265, phase: 0.9886399799797707
     },
     astrometricB1950: {
-      dRA: 4.777961264165778, dDec: -0.4304857584347518, ra: {…}, dec: {…}
+      ...
     },
     astrometricJ2000: {
-      dRA: 4.7913641878585755, dDec: -0.430134842061789, ra: {…}, dec: {…}
+      ...
     },
-    constellation: 77,
+    constellation: "Sgr Sagittarii",
     date: {
       year: 2020, month: 1, day: 1, hours: 0, minutes: 0
     },
@@ -202,6 +203,14 @@ ephemeris.Earth
 ephemeris.Observer
 
 // => Object{observer}
+```
+
+##### Get Moon Phase / Nodes / Orbit readings
+
+```
+ephemeris.moon
+
+// => Object{luna}
 ```
 
 ## Installation
