@@ -47,6 +47,10 @@ Moshier's Ephemeris is good from -3000 B.C.E - 3000 C.E. Its results are always 
 - Chiron
 - Sirius
 
+## Other Features
+- Moon Phases
+- Moon Orbit (mean apparent ascending / descending node, mean perigee, mean apogee)
+
 ## Demo
 
 Open the file: `/demo/index.html` in your browser.
@@ -208,9 +212,35 @@ ephemeris.Observer
 ##### Get Moon Phase / Nodes / Orbit readings
 
 ```
-ephemeris.moon
+// Phases
+ephemeris.moon.position
 
-// => Object{luna}
+// => {
+  ...
+  illuminatedFraction: 0.3992198452219991, // 0...1 -- 0 = none, 0.5 = half, 1 = full
+  phaseDaysBefore: 1.000054577340336,
+  phasedaysPast: undefined,
+  phaseDaysDistance: 1.000054577340336,
+  phaseDecimal: 0.2171554039712993, // 0...1 -- 0 = new, 0.25 = first q, 0.5 = full, 0.75 = last q
+  phaseQuarter: 0,
+  phaseQuarterString: "New Moon",
+  quarterApproximationDirectionString: "Entering",
+  quarterApproximationString: "First Quarter",
+  shapeDirectionString: "Waxing",
+  shapeString: "Crescent"
+  ...
+}
+
+// Orbit
+
+ephemeris.moon.orbit
+
+// {
+  meanApogee: {apparentLongitude: 0.5533761908581027, ...}
+  meanAscendingNode: {apparentLongitude: 96.6023120159835, ...}
+  meanDescendingNode:{apparentLongitude: 276.6023120159835, ...}
+  meanPerigee: {apparentLongitude: 180.5533761908581, ...}
+}
 ```
 
 ## Installation
