@@ -11,7 +11,8 @@
     <div class="container-fluid">
       <div class="row">
         <div class="col-12">
-          <h1 class="text-left">Moshier's Ephemeris Demo</h1>
+          <h1 class="text-left">Ephemeris JS Demo</h1>
+          <h2>1.1.0</h2>
         </div>
       </div>
       <div class="row">
@@ -38,6 +39,7 @@
             <button type="submit" class="btn btn-primary">Submit</button>
           </form>
           <hr />
+          <h2>Celestial Bodies</h2>
           <table id="bodies" class="table table-dark">
               <thead>
                 <tr>
@@ -168,6 +170,14 @@
               </tbody>
             </table>
             <hr />
+            <h2>Moon Phase</h2>
+            <div class="form-group">
+              <label>Quarter Approximation value</label>
+              <input class="form-control" id="moonQuarterApproximation" name="latitude" type="number" step="0.25" min="0" max="3" value="1.5"></input>
+              <div>
+                <small>Example: 1.5 = 1 1/2 days on either side of the full moon counts as the approximate "full moon"</small>
+              </div>
+            </div>
             <table id="moon" class="table table-dark">
               <thead>
                 <tr>
@@ -178,10 +188,10 @@
                     Moon Shape
                   </th>
                   <th>
-                    Approximate Moon Phase
+                    Quarter approximation direction
                   </th>
                   <th>
-                    Quarter approximation direction
+                    Approximate Moon Phase
                   </th>
                   <th>
                     Illuminated Fraction
@@ -199,6 +209,42 @@
                   <td>
 
                   </td>
+                  <td>
+
+                  </td>
+                  <td>
+
+                  </td>
+                  <td>
+
+                  </td>
+                  <td>
+
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <hr />
+            <h2>Moon Orbit</h2>
+            <table id="moonOrbit" class="table table-dark">
+              <thead>
+                <tr>
+                  <th>
+                    Mean Ascending Node
+                  </th>
+                  <th>
+                    Mean Descending Node
+                  </th>
+                  <th>
+                    Mean Perigee
+                  </th>
+                  <th>
+                    Mean Apogee
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
                   <td>
 
                   </td>
