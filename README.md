@@ -49,7 +49,7 @@ Moshier's Ephemeris is good from -3000 B.C.E - 3000 C.E. Its results are always 
 
 ## Other Features
 - Moon Phases
-- Moon Orbit (mean apparent ascending / descending node, mean perigee, mean apogee)
+- Moon Orbit (mean ascending / descending node, mean perigee, mean apogee)
 
 ## Demo
 
