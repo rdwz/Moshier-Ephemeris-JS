@@ -391,6 +391,8 @@ describe('Ephemeris', () => {
     	expect(body.position.trueGeocentricDistance).toEqual(1.4131504500560161);
 
       expect(body.position.constellation).toEqual("Sgr Sagittarii");
+
+      expect(body.motion.apparentLongitude.yesterday).toEqual(269.2371195137656);
     })
   })
 
@@ -958,15 +960,15 @@ describe('Ephemeris', () => {
     })
   })
 
-  // describe('CalculateDailyBody', () => {
-  //   it('returns an array of ephemeris calculations from start date to end date', () => {
-  //     const results = Ephemeris.CalculateDailyBody({startYear: 2000, startMonth: 1, startDay: 1, endYear: 2000, endMonth: 2, endDay: 1, latitude: 41.37, longitude: -71.1, key: 'moon'})
-  //
-  //     expect(results.length).toEqual(30)
-  //     expect(results[6].moon.position.phaseQuarterString).toEqual("New Moon") // Feb 7, 2000
-  //     expect(results[12].moon.position.phaseQuarterString).toEqual("First Quarter") // Feb 13, 2000
-  //     expect(results[19].moon.position.phaseQuarterString).toEqual("Full Moon") // Feb 20, 2000
-  //     expect(results[26].moon.position.phaseQuarterString).toEqual("Last Quarter") // Feb 27, 2000
-  //   })
-  // })
+  describe('CalculateDailyBody', () => {
+    it('returns an array of ephemeris calculations from start date to end date', () => {
+      const results = Ephemeris.CalculateDailyBody({startYear: 2000, startMonth: 1, startDay: 1, endYear: 2000, endMonth: 2, endDay: 1, latitude: 41.37, longitude: -71.1, key: 'moon'})
+
+      expect(results.length).toEqual(30)
+      expect(results[6].moon.position.phaseQuarterString).toEqual("New Moon") // Feb 7, 2000
+      expect(results[12].moon.position.phaseQuarterString).toEqual("First Quarter") // Feb 13, 2000
+      expect(results[19].moon.position.phaseQuarterString).toEqual("Full Moon") // Feb 20, 2000
+      expect(results[26].moon.position.phaseQuarterString).toEqual("Last Quarter") // Feb 27, 2000
+    })
+  })
 })

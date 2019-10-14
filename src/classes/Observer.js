@@ -31,15 +31,15 @@ export default class Observer {
     // * float height
     // * string OR array[string] key - ex: pass in "venus" or ["mercury", "venus"] or leave blank for all
 
-    this._year = validateYear(year)
-    this._month = validateMonth(month) // Reconcile month to use 1 - 12 range with legacy code
-    this._day = validateDate(day)
-    this._hours = validateHour(hours)
-    this._minutes = validateMinute(minutes)
-    this._seconds = validateSecond(seconds)
-    this._latitude = validateLatitude(latitude)
-    this._longitude = validateLongitude(longitude)
-    this._height = validateNumber(height)
+    this.year = validateYear(year)
+    this.month = validateMonth(month) // Reconcile month to use 1 - 12 range with legacy code
+    this.day = validateDate(day)
+    this.hours = validateHour(hours)
+    this.minutes = validateMinute(minutes)
+    this.seconds = validateSecond(seconds)
+    this.latitude = validateLatitude(latitude)
+    this.longitude = validateLongitude(longitude)
+    this.height = validateNumber(height)
 
     this.glat = latitude // geodetic latitude
     this.tlat // calculated geocentric latitude
@@ -86,9 +86,9 @@ export default class Observer {
   }
 
   CalculateDates() {
-    const dateObject = { year: this._year, month: this._month, day: this._day, hours: this._hours, minutes: this._minutes, seconds: this._seconds }
+    const dateObject = { year: this.year, month: this.month, day: this.day, hours: this.hours, minutes: this.minutes, seconds: this.seconds }
     let date = {}
-    date.utc = new Date(Date.UTC(this._year, this._month, this._day, this._hours, this._minutes, this._seconds))
+    date.utc = new Date(Date.UTC(this.year, this.month, this.day, this.hours, this.minutes, this.seconds))
     date.dateString = date.utc.toDateString()
     date.julian = julian.calcJulianDate({...dateObject, month: dateObject.month + 1}), // month + 1 for formula
     date.j2000 = julian.calcJ2000(date.julian),

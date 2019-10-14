@@ -11,9 +11,10 @@ import { lonlat } from '../utilities/lonlat'
 import { nutation } from '../utilities/nutation'
 import { precess } from '../utilities/precess'
 import { util } from '../utilities/util'
+import Ephemeris from '../Ephemeris'
 
 export default class HeliocentricOrbitalBody {
-  constructor(body, earthBody, observer) {
+  constructor(body, earthBody, observer, calculateMotion) {
     this._body = this.calculateBody(body, earthBody, observer)
 
     Object.keys(this._body).forEach(key => {
@@ -22,6 +23,56 @@ export default class HeliocentricOrbitalBody {
 
     this.calculateBody = this.calculateBody.bind(this)
     this.reduceBody = this.reduceBody.bind(this)
+
+    if (calculateMotion) {
+      const yesterday = new Date(observer.Date.utc)
+      yesterday.setDate(observer.Date.utc.getDate() - 1)
+      this.motion = {}
+      this.motion.apparentLongitude = {}
+      this.motion.apparentLongitude.yesterday = new Ephemeris(
+        {
+          year:yesterday.getFullYear(),
+          month: yesterday.getMonth(),
+          day: yesterday.getDate(),
+          hours: yesterday.getHours(),
+          minutes: yesterday.getMinutes(),
+          seconds: yesterday.getSeconds(),
+          latitude: observer.latitude,
+          longitude: observer.longitude,
+          height: observer.height,
+          key: body.key,
+          calculateMotion: false
+        }
+      )[body.key].position.apparentLongitude
+
+      const yesterdayDifference = util.getModuloDifference(this.position.apparentLongitude, this.motion.apparentLongitude.yesterday, 360)
+
+      this.motion.apparentLongitude.yesterdayDifference = util.correctRealModuloNumber(yesterdayDifference, this.position.apparentLongitude, this.motion.apparentLongitude.yesterday, 360)
+
+      const tomorrow = new Date(observer.Date.utc)
+      tomorrow.setDate(observer.Date.utc.getDate() + 1)
+      this.motion.apparentLongitude.tomorrow = new Ephemeris(
+        {
+          year:tomorrow.getFullYear(),
+          month: tomorrow.getMonth(),
+          day: tomorrow.getDate(),
+          hours: tomorrow.getHours(),
+          minutes: tomorrow.getMinutes(),
+          seconds: tomorrow.getSeconds(),
+          latitude: observer.latitude,
+          longitude: observer.longitude,
+          height: observer.height,
+          key: body.key,
+          calculateMotion: false
+        }
+      )[body.key].position.apparentLongitude
+
+      const tomorrowDifference = util.getModuloDifference(this.motion.apparentLongitude.tomorrow, this.position.apparentLongitude, 360)
+
+      this.motion.apparentLongitude.tomorrowDifference = util.correctRealModuloNumber(tomorrowDifference, this.motion.apparentLongitude.tomorrow, this.position.apparentLongitude, 360)
+
+      this.motion.apparentLongitude.differencePercent = this.motion.apparentLongitude.tomorrowDifference / this.motion.apparentLongitude.yesterdayDifference
+    }
   }
 
   calculateBody(body, earthBody, observer) {
