@@ -18,7 +18,8 @@ new Ephemeris: {
       shapeDirectionString: string // 'Waxing' or 'Waning' depending on the phaseDecimal value
       shapeString: string // 'Crescent' or 'Gibbous' depending on the illuminatedFraction
       quarterApproximationValue: float // the amount (in days) in either direction of a quarter event to allow for determining the approximate quarter phase. Defaults to 1.5 days in either direction of a quarter event.
-      quarterApproximationString: string // 'Entering' or 'Leaving' QUARTER EVENT<'New Moon', 'First Quarter', 'Full Moon', 'Last Quarter'> determined by the phaseDecimal and quarterApproximationValue
+      quarterApproximationString: string // QUARTER EVENT<'New Moon', 'First Quarter', 'Full Moon', 'Last Quarter'> determined by the phaseDecimal and quarterApproximationValue
+      quarterApproximationDirectionString: string // "Entering" or "Leaving" the quarter approximation
       withinQuarterApproximation: boolean // true/false determined by whether phaseDecimal is inside of quarterApproximationValue
     }
     orbit: {
