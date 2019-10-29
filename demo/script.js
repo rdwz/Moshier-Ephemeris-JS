@@ -19,7 +19,7 @@ class Demo {
     const time = this.timeInput.value.split(':')
     const origin = {
       year: parseInt(date[0]),
-      month: parseInt(date[1]),
+      month: parseInt(date[1] - 1),
       day: parseInt(date[2]),
       hours: parseInt(time[0]),
       minutes: parseInt(time[1]),
@@ -38,6 +38,9 @@ class Demo {
 
     const dmsEl = document.querySelector(`#${result.key}-dms`)
     if (dmsEl) dmsEl.innerHTML = result.position.apparentLongitudeString
+
+    const retroEl = document.querySelector(`#${result.key}-r`)
+    if (retroEl) retroEl.innerHTML = result.motion.isRetrograde ? '-R' : ''
   })
 
   const moonTableEls = this.moonTable.querySelectorAll('tbody td')

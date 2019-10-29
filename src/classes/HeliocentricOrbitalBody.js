@@ -11,67 +11,25 @@ import { lonlat } from '../utilities/lonlat'
 import { nutation } from '../utilities/nutation'
 import { precess } from '../utilities/precess'
 import { util } from '../utilities/util'
+import { getNextApparentLongitude, getNextMinute, getApparentLongitudeDifference } from '../utilities/motion'
 import Ephemeris from '../Ephemeris'
 
 export default class HeliocentricOrbitalBody {
   constructor(body, earthBody, observer, calculateMotion) {
-    this._body = this.calculateBody(body, earthBody, observer)
-
-    Object.keys(this._body).forEach(key => {
+    this._earthBody = earthBody
+    this._observer = observer
+    this._calculateMotion = calculateMotion
+    this._body = this.calculateBody(body, this._earthBody, this._observer)
+    Object.keys(this._body).filter(k => k !== '_body').forEach(key => {
       this[key] = this._body[key]
     })
 
     this.calculateBody = this.calculateBody.bind(this)
     this.reduceBody = this.reduceBody.bind(this)
+    this.calculateMotion = this.calculateMotion.bind(this)
 
     if (calculateMotion) {
-      const yesterday = new Date(observer.Date.utc)
-      yesterday.setDate(observer.Date.utc.getDate() - 1)
-      this.motion = {}
-      this.motion.apparentLongitude = {}
-      this.motion.apparentLongitude.yesterday = new Ephemeris(
-        {
-          year:yesterday.getFullYear(),
-          month: yesterday.getMonth(),
-          day: yesterday.getDate(),
-          hours: yesterday.getHours(),
-          minutes: yesterday.getMinutes(),
-          seconds: yesterday.getSeconds(),
-          latitude: observer.latitude,
-          longitude: observer.longitude,
-          height: observer.height,
-          key: body.key,
-          calculateMotion: false
-        }
-      )[body.key].position.apparentLongitude
-
-      const yesterdayDifference = util.getModuloDifference(this.position.apparentLongitude, this.motion.apparentLongitude.yesterday, 360)
-
-      this.motion.apparentLongitude.yesterdayDifference = util.correctRealModuloNumber(yesterdayDifference, this.position.apparentLongitude, this.motion.apparentLongitude.yesterday, 360)
-
-      const tomorrow = new Date(observer.Date.utc)
-      tomorrow.setDate(observer.Date.utc.getDate() + 1)
-      this.motion.apparentLongitude.tomorrow = new Ephemeris(
-        {
-          year:tomorrow.getFullYear(),
-          month: tomorrow.getMonth(),
-          day: tomorrow.getDate(),
-          hours: tomorrow.getHours(),
-          minutes: tomorrow.getMinutes(),
-          seconds: tomorrow.getSeconds(),
-          latitude: observer.latitude,
-          longitude: observer.longitude,
-          height: observer.height,
-          key: body.key,
-          calculateMotion: false
-        }
-      )[body.key].position.apparentLongitude
-
-      const tomorrowDifference = util.getModuloDifference(this.motion.apparentLongitude.tomorrow, this.position.apparentLongitude, 360)
-
-      this.motion.apparentLongitude.tomorrowDifference = util.correctRealModuloNumber(tomorrowDifference, this.motion.apparentLongitude.tomorrow, this.position.apparentLongitude, 360)
-
-      this.motion.apparentLongitude.differencePercent = this.motion.apparentLongitude.tomorrowDifference / this.motion.apparentLongitude.yesterdayDifference
+      this.calculateMotion(body, observer)
     }
   }
 
@@ -84,6 +42,31 @@ export default class HeliocentricOrbitalBody {
   	body = kepler.calc(observer.Date.julian, body); // NOTE mutates body
   	/* apply correction factors and print apparent place */
   	return this.reduceBody(body, body.position.rect, earthBody.position.rect, earthBody, observer);
+  }
+
+  calculateMotion(body, observer) {
+    this.motion = {}
+
+    this.motion.nextMinuteApparentLongitude = getNextApparentLongitude(body.key, getNextMinute(observer.Date.utc), observer)
+
+    this.motion.nextMinuteApparentLongitudeDifference = getApparentLongitudeDifference(this.position.apparentLongitude, this.motion.nextMinuteApparentLongitude)
+
+    this.motion.isRetrograde = !!(this.motion.nextMinuteApparentLongitudeDifference < 0)
+
+    // console.log(this._observer.Date.utc,
+    //   this.position.apparentLongitude,
+    //   this.motion.nextMinuteApparentLongitude, this.motion.nextMinuteApparentLongitudeDifference,
+    // this.motion.isRetrograde)
+
+
+    this.motion.nextRetrogradeDate
+    this.motion.prevRetrogradeDate
+
+    this.motion.nextRetrogradeApparentLongitude
+    this.motion.withinPreRetrogradeShadow
+
+    this.motion.prevRetrogradeApparentLongitude
+    this.motion.withinPostRetrogradeShadow
   }
 
   reduceBody(body, q, e, earthBody, observer) {

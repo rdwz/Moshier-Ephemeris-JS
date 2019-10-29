@@ -392,7 +392,6 @@ describe('Ephemeris', () => {
 
       expect(body.position.constellation).toEqual("Sgr Sagittarii");
 
-      expect(body.motion.apparentLongitude.yesterday).toEqual(269.2371195137656);
     })
   })
 
