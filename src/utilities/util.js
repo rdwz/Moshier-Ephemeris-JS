@@ -438,3 +438,8 @@ util.correctRealModuloNumber = (absDiff, n1, n2, mod) => {
   // between n1, n2
   return (n1 >= n2) || ((n1 + mod) - n2) === absDiff ? absDiff : -absDiff
 }
+
+
+util.cloneUTCDate = utcDate => {
+  return new Date(Date.UTC(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), utcDate.getUTCDate(), utcDate.getUTCHours(), utcDate.getUTCMinutes(), utcDate.getUTCSeconds()))
+}

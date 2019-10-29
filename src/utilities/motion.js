@@ -6,7 +6,7 @@ export const getDirectedDate = ({direction = 'next', unit = 'date', utcDate}={})
   if (!['next', 'prev'].includes(direction)) throw new Error(`Please pass in direction from the following: 'next' or 'prev'. Not "${direction}".`)
   if (!['date', 'minute'].includes(unit)) throw new Error(`Please pass in unit from the following: 'date' or 'minute'. Not "${unit}".`)
 
-  const newDate = new Date(utcDate)
+  const newDate = util.cloneUTCDate(utcDate)
   const directionIncrement = direction === 'next' ? 1 : -1
 
   if (unit === 'date') {
@@ -16,6 +16,22 @@ export const getDirectedDate = ({direction = 'next', unit = 'date', utcDate}={})
   }
 
   return newDate
+}
+
+const getCurrentMovementAmount = (bodyKey, utcDate, currentApparentLongitude) => {
+  if (!currentApparentLongitude) {
+    currentApparentLongitude = getApparentLongitude(bodyKey, utcDate)
+  }
+
+  return getApparentLongitudeDifference(currentApparentLongitude, getApparentLongitude(bodyKey, getDirectedDate({direction: "next", unit: "minute", utcDate})))
+}
+
+const isRetrograde = movementAmount => {
+  return movementAmount <= 0
+}
+
+const isDirect = movementAmount => {
+  return movementAmount >= 0
 }
 
 export const getApparentLongitude = (bodyKey, utcDate) => {
@@ -46,19 +62,19 @@ export const calculateNextRetrogradeStation = ({bodyKey, utcDate, currentApparen
     currentApparentLongitude = getApparentLongitude(bodyKey, utcDate)
   }
 
-  let currentDate = new Date(Date.UTC(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), utcDate.getUTCDate(), utcDate.getUTCHours(), utcDate.getUTCMinutes()))
+  let currentDate = util.cloneUTCDate(utcDate)
 
-  let currentMovementAmount = getApparentLongitudeDifference(currentApparentLongitude, getApparentLongitude(bodyKey, getDirectedDate({direction: "next", unit: "minute", utcDate})))
+  let currentMovementAmount = getCurrentMovementAmount(bodyKey, utcDate, currentApparentLongitude)
 
   // Skip to end of current retrograde if movement indicates we're in one at start
-  if (currentMovementAmount <= 0 ) {
+  if (isRetrograde(currentMovementAmount)) {
     const endOfCurrentRetrograde = calculateNextDirectStation({bodyKey, utcDate: currentDate, currentApparentLongitude})
     currentDate = endOfCurrentRetrograde.date,
     currentApparentLongitude = endOfCurrentRetrograde.apparentLongitude
     currentMovementAmount = endOfCurrentRetrograde.nextMinuteDifference
   }
 
-  while(currentMovementAmount > 0) {
+  while(isDirect(currentMovementAmount)) {
     // console.log("current: ", currentDate, currentMovementAmount)
     const nextDate = getDirectedDate({direction:"next", unit: "date", utcDate:currentDate})
     const tomorrowApparentLongitude = new Ephemeris({
@@ -75,7 +91,7 @@ export const calculateNextRetrogradeStation = ({bodyKey, utcDate, currentApparen
     const nextCurrentMovementAmount = getApparentLongitudeDifference(currentApparentLongitude, tomorrowApparentLongitude)
 
 
-    if (nextCurrentMovementAmount <= 0 ) {
+    if (isRetrograde(nextCurrentMovementAmount)) {
       // Rewind by 1 day and find the exact minute it turns retro
       let prevDate = getDirectedDate({direction:"prev", unit: "date", utcDate:currentDate})
       let prevApparentLongitude = new Ephemeris({
@@ -91,7 +107,7 @@ export const calculateNextRetrogradeStation = ({bodyKey, utcDate, currentApparen
 
       let prevMovementAmount = getApparentLongitudeDifference(prevApparentLongitude, currentApparentLongitude)
 
-      while (prevMovementAmount > 0) {
+      while (isDirect(prevMovementAmount)) {
         // console.log("current min: ", prevDate, prevMovementAmount)
         const nextMinute = getDirectedDate({direction: "next", unit: "minute", utcDate: prevDate})
         const nextMinuteApparentLongitude = new Ephemeris({
@@ -107,7 +123,7 @@ export const calculateNextRetrogradeStation = ({bodyKey, utcDate, currentApparen
 
         const nextCurrentMovementAmount = getApparentLongitudeDifference(prevApparentLongitude, nextMinuteApparentLongitude)
 
-        if (nextCurrentMovementAmount <= 0) {
+        if (isRetrograde(nextCurrentMovementAmount)) {
           console.log('BREAK!', prevDate)
           return {
             date: prevDate,
@@ -134,11 +150,13 @@ export const calculateNextDirectStation = ({bodyKey, utcDate, currentApparentLon
     currentApparentLongitude = getApparentLongitude(bodyKey, utcDate)
   }
 
-  let currentDate = new Date(Date.UTC(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), utcDate.getUTCDate(), utcDate.getUTCHours(), utcDate.getUTCMinutes()))
+  let currentDate = util.cloneUTCDate(utcDate)
 
-  let currentMovementAmount = getApparentLongitudeDifference(currentApparentLongitude, getApparentLongitude(bodyKey, getDirectedDate({direction: "next", unit: "minute", utcDate})))
+  let currentMovementAmount = getCurrentMovementAmount(bodyKey, utcDate, currentApparentLongitude)
+
+
   // Skip to end of current direct if movement indicates we're in one at start
-  if (currentMovementAmount >= 0 ) {
+  if (isDirect(currentMovementAmount)) {
     const endOfCurrentDirect = calculateNextRetrogradeStation({bodyKey, utcDate: currentDate, currentApparentLongitude})
     currentDate = endOfCurrentDirect.date,
     currentApparentLongitude = endOfCurrentDirect.apparentLongitude
@@ -146,7 +164,7 @@ export const calculateNextDirectStation = ({bodyKey, utcDate, currentApparentLon
   }
 
   console.log("initial: ", currentDate, currentMovementAmount)
-  while(currentMovementAmount < 0) {
+  while(isRetrograde(currentMovementAmount)) {
     // console.log("current: ", currentDate, currentMovementAmount)
     const nextDate = getDirectedDate({direction:"next", unit: "date", utcDate:currentDate})
     const tomorrowApparentLongitude = new Ephemeris({
@@ -163,7 +181,7 @@ export const calculateNextDirectStation = ({bodyKey, utcDate, currentApparentLon
     const nextCurrentMovementAmount = getApparentLongitudeDifference(currentApparentLongitude, tomorrowApparentLongitude)
 
 
-    if (nextCurrentMovementAmount >= 0 ) {
+    if (isDirect(nextCurrentMovementAmount)) {
       // Rewind by 1 day and find the exact minute it turns direct
       let prevDate = getDirectedDate({direction:"prev", unit: "date", utcDate:currentDate})
       let prevApparentLongitude = new Ephemeris({
@@ -179,7 +197,7 @@ export const calculateNextDirectStation = ({bodyKey, utcDate, currentApparentLon
 
       let prevMovementAmount = getApparentLongitudeDifference(prevApparentLongitude, currentApparentLongitude)
 
-      while (prevMovementAmount < 0) {
+      while (isRetrograde(prevMovementAmount)) {
         // console.log("current min: ", prevDate, prevMovementAmount)
         const nextMinute = getDirectedDate({direction: "next", unit: "minute", utcDate: prevDate})
         const nextMinuteApparentLongitude = new Ephemeris({
@@ -195,7 +213,7 @@ export const calculateNextDirectStation = ({bodyKey, utcDate, currentApparentLon
 
         const nextCurrentMovementAmount = getApparentLongitudeDifference(prevApparentLongitude, nextMinuteApparentLongitude)
 
-        if (nextCurrentMovementAmount >= 0) {
+        if (isDirect(nextCurrentMovementAmount)) {
           console.log('BREAK!', prevDate)
           return {
             date: prevDate,
