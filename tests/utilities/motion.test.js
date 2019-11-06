@@ -84,7 +84,6 @@ describe('calculateNextRetrogradeStation', () => {
         expect(station.date).toEqual(new Date("2020-02-17T00:54:58.000Z")) // 11/20/2019 19:12:36 UTC
         expect(station.apparentLongitude).toEqual(342.88971141888965)
         expect(station.nextMovementAmount).toEqual(-5.3717030823463574e-11)
-
       })
     })
 
@@ -114,7 +113,6 @@ describe('calculateNextDirectStation', () => {
         expect(station.date).toEqual(new Date("2019-11-20T19:12:37.000Z")) // 10/31/2019 15:42:26 UTC
         expect(station.apparentLongitude).toEqual(221.58646545567194)
         expect(station.nextMovementAmount).toEqual(2.8421709430404007e-11)
-
       })
     })
 
@@ -123,7 +121,7 @@ describe('calculateNextDirectStation', () => {
         const utcDate = new Date(Date.UTC(2019, 9, 31, 0, 0)) // direct 10/31/2019 midnight UTC
         const station = calculateNextDirectStation({direction: 'prev', bodyKey: 'mercury', utcDate})
 
-        expect(station.date).toEqual(new Date("2019-08-01T03:59:01.000Z")) // 7/7/2019 23:15:03 UTC
+        expect(station.date).toEqual(new Date("2019-08-01T03:59:01.000Z")) // 8/1/2019 3:59:01 UTC
         expect(station.apparentLongitude).toEqual(113.94763604622884)
         expect(station.nextMovementAmount).toEqual(3.389004632481374e-10)
 
@@ -172,7 +170,6 @@ describe('calculateNextRetrogradeMoment', () => {
 
         expect(moment.apparentLongitude).toEqual(237.6378590865681)
         expect(moment.nextMovementAmount).toEqual(-1.4779288903810084e-12)
-
       })
     })
 
@@ -186,7 +183,6 @@ describe('calculateNextRetrogradeMoment', () => {
 
         expect(moment.apparentLongitude).toEqual(113.94763604652988)
         expect(moment.nextMovementAmount).toEqual(-3.0104274628683925e-10)
-
       })
     })
   })
