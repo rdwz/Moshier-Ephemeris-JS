@@ -105,26 +105,56 @@ describe('calculateNextRetrogradeStation', () => {
 
 describe('calculateNextDirectStation', () => {
   describe('in a direct datetime', () => {
-    it('finds the next direct station', () => {
-      const utcDate = new Date(Date.UTC(2019, 9, 31, 0, 0)) // direct on 10/31/2019 midnight UTC
-      const station = calculateNextDirectStation({bodyKey: 'mercury', utcDate})
+    describe('next', () => {
 
-      expect(station.date).toEqual(new Date("2019-11-20T19:13:00.000Z")) // 11/20/2019 19:13 UTC
-      expect(station.apparentLongitude).toEqual(221.58646545546335)
-      expect(station.nextMovementAmount).toEqual(6.07640515681851e-8)
+      it('finds the next direct station', () => {
+        const utcDate = new Date(Date.UTC(2019, 9, 31, 0, 0)) // direct 10/31/2019 midnight UTC
+        const station = calculateNextDirectStation({direction: 'next', bodyKey: 'mercury', utcDate})
 
+        expect(station.date).toEqual(new Date("2019-11-20T19:12:37.000Z")) // 10/31/2019 15:42:26 UTC
+        expect(station.apparentLongitude).toEqual(221.58646545567194)
+        expect(station.nextMovementAmount).toEqual(2.8421709430404007e-11)
+
+      })
+    })
+
+    describe('prev', () => {
+      it('finds the prev direct station', () => {
+        const utcDate = new Date(Date.UTC(2019, 9, 31, 0, 0)) // direct 10/31/2019 midnight UTC
+        const station = calculateNextDirectStation({direction: 'prev', bodyKey: 'mercury', utcDate})
+
+        expect(station.date).toEqual(new Date("2019-08-01T03:59:01.000Z")) // 7/7/2019 23:15:03 UTC
+        expect(station.apparentLongitude).toEqual(113.94763604622884)
+        expect(station.nextMovementAmount).toEqual(3.389004632481374e-10)
+
+      })
     })
   })
 
   describe('in a retrograde datetime', () => {
-    it('finds the next direct station', () => {
-      const utcDate = new Date(Date.UTC(2019, 9, 31, 20, 0)) // retrograde on 10/31/2019 20:00 UTC
-      const station = calculateNextDirectStation({bodyKey: 'mercury', utcDate})
+    describe('next', () => {
+      it('finds the next direct station', () => {
+        const utcDate = new Date(Date.UTC(2019, 9, 31, 20, 0)) // retrograde 10/31/2019 20:00 UTC
+        const station = calculateNextDirectStation({bodyKey: 'mercury', utcDate})
 
-      expect(station.date).toEqual(new Date("2019-11-20T19:13:00.000Z")) // 11/20/2019 19:13 UTC
-      expect(station.apparentLongitude).toEqual(221.58646545546335)
-      expect(station.nextMovementAmount).toEqual(6.07640515681851e-8)
+        expect(station.date).toEqual(new Date("2019-11-20T19:12:37.000Z")) // 11/20/2019 19:12:36 UTC
+        expect(station.apparentLongitude).toEqual(221.58646545567194)
+        expect(station.nextMovementAmount).toEqual(2.8421709430404007e-11)
 
+      })
+    })
+
+    describe('prev', () => {
+      it('finds the prev direct station', () => {
+        const utcDate = new Date(Date.UTC(2019, 9, 31, 20, 0)) // retrograde 10/31/2019 20:00 UTC
+        const station = calculateNextDirectStation({direction: 'prev', bodyKey: 'mercury', utcDate})
+
+
+        expect(station.date).toEqual(new Date("2019-08-01T03:59:01.000Z")) // 10/31/2019 15:42:26 UTC
+        expect(station.apparentLongitude).toEqual(113.94763604622884)
+        expect(station.nextMovementAmount).toEqual(3.389004632481374e-10)
+
+      })
     })
   })
 })
@@ -152,7 +182,7 @@ describe('calculateNextRetrogradeMoment', () => {
 
         const moment = calculateNextRetrogradeMoment({bodyKey: 'mercury', utcDate, direction: 'prev'})
 
-        expect(moment.date).toEqual(new Date("2019-08-01T03:59:00.000Z")) // 8/01/2019 03:59:00 UTC
+        expect(moment.date).toEqual(new Date("2019-08-01T03:59:00.000Z")) // 8/01/2019 03:59:22 UTC
 
         expect(moment.apparentLongitude).toEqual(113.94763604652988)
         expect(moment.nextMovementAmount).toEqual(-3.0104274628683925e-10)
@@ -197,7 +227,7 @@ describe('calculateNextDirectMoment', () => {
 
         const moment = calculateNextDirectMoment({bodyKey: 'mercury', utcDate, direction: 'next'})
 
-        expect(moment.date).toEqual(new Date("2019-11-20T19:12:37.000Z")) // 11/20/2019 19:13 UTC
+        expect(moment.date).toEqual(new Date("2019-11-20T19:12:37.000Z")) // 11/20/2019 19:12:37 UTC
 
         expect(moment.apparentLongitude).toEqual(221.58646545567194)
         expect(moment.nextMovementAmount).toEqual(2.8421709430404007e-11)

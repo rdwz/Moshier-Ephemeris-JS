@@ -113,7 +113,10 @@ export const calculateNextRetrogradeStation = ({direction='next', bodyKey, utcDa
 
 }
 
-export const calculateNextDirectStation = ({bodyKey, utcDate, currentApparentLongitude=null}={}) => {
+export const calculateNextDirectStation = ({direction='next', bodyKey, utcDate, currentApparentLongitude=null}={}) => {
+  if (!['next', 'prev'].includes(direction)) throw new Error(`Please pass in direction from the following: 'next' or 'prev'. Not "${direction}".`)
+
+
   if (!currentApparentLongitude) {
     currentApparentLongitude = getApparentLongitude(bodyKey, utcDate)
   }
@@ -123,12 +126,33 @@ export const calculateNextDirectStation = ({bodyKey, utcDate, currentApparentLon
   let currentMovementAmount = getCurrentMovementAmount(bodyKey, utcDate, currentApparentLongitude)
 
 
-  // Skip to end of current direct if movement indicates we're in one at start
   if (isDirect(currentMovementAmount)) {
-    const endOfCurrentDirect = calculateNextRetrogradeStation({bodyKey, utcDate: currentDate, currentApparentLongitude})
-    currentDate = endOfCurrentDirect.date,
-    currentApparentLongitude = endOfCurrentDirect.apparentLongitude
-    currentMovementAmount = endOfCurrentDirect.nextMovementAmount
+    if (direction === 'next') {
+      // Skip to end of current retrograde if movement indicates we're in one
+      // and find the next retrograde moment from there
+      const nextDirectMoment = calculateNextRetrogradeMoment({direction: 'next', bodyKey, utcDate: currentDate, currentApparentLongitude})
+
+      return calculateNextDirectMoment({direction: 'next', bodyKey, utcDate: nextDirectMoment.date, currentApparentLongitude: nextDirectMoment.apparentLongitude})
+
+    } else if (direction === 'prev') {
+      // Skip backwards through entire retrograde to find next direct moment
+      const prevDirectMoment = calculateNextRetrogradeMoment({direction: 'prev', bodyKey, utcDate: currentDate, currentApparentLongitude})
+
+      return calculateNextDirectMoment({direction: 'next', bodyKey, utcDate: prevDirectMoment.date, currentApparentLongitude: prevDirectMoment.apparentLongitude})
+    }
+  } else {
+    if (direction === 'next') {
+      return calculateNextDirectMoment({direction: 'next', bodyKey, utcDate, currentApparentLongitude})
+    } else if (direction === 'prev') {
+      // Find prev direct moment
+      const prevRetroMoment = calculateNextDirectMoment({direction: 'prev', bodyKey, utcDate: currentDate, currentApparentLongitude})
+
+      // Skip backwards through entire direct to find next retrograde moment
+      const prevDirectMoment = calculateNextRetrogradeMoment({direction: 'prev', bodyKey, utcDate: prevRetroMoment.date, currentApparentLongitude: prevRetroMoment.apparentLongitude})
+
+      // Find the first direct moment from the other side
+      return calculateNextDirectMoment({direction: 'next', bodyKey, utcDate: prevDirectMoment.date, currentApparentLongitude: prevDirectMoment.apparentLongitude})
+    }
   }
 }
 
@@ -146,6 +170,7 @@ export const calculateNextRetrogradeMoment = ({bodyKey, utcDate, currentApparent
   if (isRetrograde(currentMovementAmount)) return motionEventObject({utcDate: currentDate, apparentLongitude: currentApparentLongitude, nextMovementAmount: currentMovementAmount, interval: 'second'})
 
   let intervalUnit
+  let fixedDate
   while(isDirect(currentMovementAmount)) {
     const tuningDirection = direction
     intervalUnit = 'date'
@@ -162,9 +187,18 @@ export const calculateNextRetrogradeMoment = ({bodyKey, utcDate, currentApparent
     currentMovementAmount = getCurrentMovementAmount(bodyKey, currentDate, currentApparentLongitude)
   }
 
-  while(isRetrograde(currentMovementAmount)) {
+  // NOTE - standardizes the approach to always approach from previous frame.
+  // This is because I've found that calculating the next event can produce varied results when calculating the second of that event from the bottom of the minute (0:00) or the top of the minute (0:59)
+  // For example, approaching from the bottom will find the event at 0:01, and approaching from the top another will find it at 0:50.
+  fixedDate = util.cloneUTCDate(currentDate)
+  fixedDate = getDirectedDate({direction: 'prev', unit: intervalUnit, utcDate: fixedDate})
+  currentDate = fixedDate
+  currentApparentLongitude = getApparentLongitude(bodyKey, currentDate)
+  currentMovementAmount = getCurrentMovementAmount(bodyKey, currentDate, currentApparentLongitude)
+
+  while(direction === 'next' ? isDirect(currentMovementAmount) : isRetrograde(currentMovementAmount)) {
     // Shifts by 1 hour until the first direct hour is found
-    const tuningDirection = direction === 'next' ? 'prev' : 'next'
+    const tuningDirection = 'next'
     intervalUnit = 'hour'
 
     // reset date minutes
@@ -177,9 +211,15 @@ export const calculateNextRetrogradeMoment = ({bodyKey, utcDate, currentApparent
     currentMovementAmount = getCurrentMovementAmount(bodyKey, currentDate, currentApparentLongitude)
   }
 
-  while(isDirect(currentMovementAmount)) {
+  fixedDate = util.cloneUTCDate(currentDate)
+  fixedDate = getDirectedDate({direction: 'prev', unit: intervalUnit, utcDate: fixedDate})
+  currentDate = fixedDate
+  currentApparentLongitude = getApparentLongitude(bodyKey, currentDate)
+  currentMovementAmount = getCurrentMovementAmount(bodyKey, currentDate, currentApparentLongitude)
+
+  while(direction === 'next' ? isDirect(currentMovementAmount) : isRetrograde(currentMovementAmount)) {
     // Shifts by 1 minute until the first direct minute is found
-    const tuningDirection = direction
+    const tuningDirection = 'next'
     intervalUnit = 'minute'
 
     // reset date seconds
@@ -191,22 +231,16 @@ export const calculateNextRetrogradeMoment = ({bodyKey, utcDate, currentApparent
     currentMovementAmount = getCurrentMovementAmount(bodyKey, currentDate, currentApparentLongitude)
   }
 
-  // NOTE - standardizes the final approach to always approach from previous minute.
-  // This is because I've found that calculating the next event can produce varied results when calculating the second of that event from the bottom of the minute (0:00) or the top of the minute (0:59)
-  // For example, approaching from the bottom will find the event at 0:01, and approaching from the top another will find it at 0:50.
-  if (direction === 'next') {
-    let fixedDate = util.cloneUTCDate(currentDate)
-    fixedDate = getDirectedDate({direction: 'prev', unit: 'minute', utcDate: fixedDate})
-    currentDate = fixedDate
-    currentApparentLongitude = getApparentLongitude(bodyKey, currentDate)
-    currentMovementAmount = getCurrentMovementAmount(bodyKey, currentDate, currentApparentLongitude)
-  }
-
+  fixedDate = util.cloneUTCDate(currentDate)
+  fixedDate = getDirectedDate({direction: 'prev', unit: intervalUnit, utcDate: fixedDate})
+  currentDate = fixedDate
+  currentApparentLongitude = getApparentLongitude(bodyKey, currentDate)
+  currentMovementAmount = getCurrentMovementAmount(bodyKey, currentDate, currentApparentLongitude)
 
   let lastDate = currentDate
   let lastAppLong = currentApparentLongitude
   let lastMovementAmount = currentMovementAmount
-  while(direction === 'next' ? isDirect(currentMovementAmount) : isRetrograde(currentMovementAmount)) {
+  while(direction === 'next' ? isDirect(currentMovementAmount) : isRetrograde(lastMovementAmount)) {
     // Shifts by 1 second until the first retrograde second is found
     const tuningDirection = 'next'
     intervalUnit = 'second'
@@ -242,6 +276,7 @@ export const calculateNextDirectMoment = ({bodyKey, utcDate, currentApparentLong
   if (isDirect(currentMovementAmount)) return motionEventObject({utcDate, apparentLongitude: currentApparentLongitude, nextMovementAmount: currentMovementAmount, interval: 'second'})
 
   let intervalUnit
+  let fixedDate
   while(isRetrograde(currentMovementAmount)) {
     const tuningDirection = direction
     intervalUnit = 'date'
@@ -257,9 +292,15 @@ export const calculateNextDirectMoment = ({bodyKey, utcDate, currentApparentLong
     currentMovementAmount = getCurrentMovementAmount(bodyKey, currentDate, currentApparentLongitude)
   }
 
-  while(isDirect(currentMovementAmount)) {
+  fixedDate = util.cloneUTCDate(currentDate)
+  fixedDate = getDirectedDate({direction: 'prev', unit: intervalUnit, utcDate: fixedDate})
+  currentDate = fixedDate
+  currentApparentLongitude = getApparentLongitude(bodyKey, currentDate)
+  currentMovementAmount = getCurrentMovementAmount(bodyKey, currentDate, currentApparentLongitude)
+
+  while(direction === 'next' ? isRetrograde(currentMovementAmount) : isDirect(currentMovementAmount)) {
     // Shifts by 1 hour until the first direct hour is found
-    const tuningDirection = direction === 'next' ? 'prev' : 'next'
+    const tuningDirection = 'next'
     intervalUnit = 'hour'
 
     // reset date minutes
@@ -272,9 +313,15 @@ export const calculateNextDirectMoment = ({bodyKey, utcDate, currentApparentLong
     currentMovementAmount = getCurrentMovementAmount(bodyKey, currentDate, currentApparentLongitude)
   }
 
-  while(isRetrograde(currentMovementAmount)) {
+  fixedDate = util.cloneUTCDate(currentDate)
+  fixedDate = getDirectedDate({direction: 'prev', unit: intervalUnit, utcDate: fixedDate})
+  currentDate = fixedDate
+  currentApparentLongitude = getApparentLongitude(bodyKey, currentDate)
+  currentMovementAmount = getCurrentMovementAmount(bodyKey, currentDate, currentApparentLongitude)
+
+  while(direction === 'next' ? isRetrograde(currentMovementAmount) : isDirect(currentMovementAmount)) {
     // Shifts by 1 minute until the first direct minute is found
-    const tuningDirection = direction
+    const tuningDirection = 'next'
     intervalUnit = 'minute'
 
     // reset date seconds
@@ -289,13 +336,11 @@ export const calculateNextDirectMoment = ({bodyKey, utcDate, currentApparentLong
   // NOTE - standardizes the final approach to always approach from previous minute.
   // This is because I've found that calculating the next event can produce varied results when calculating the second of that event from the bottom of the minute (0:00) or the top of the minute (0:59)
   // For example, approaching from the bottom will find the event at 0:01, and approaching from the top another will find it at 0:50.
-  if (direction === 'next') {
-    let fixedDate = util.cloneUTCDate(currentDate)
-    fixedDate = getDirectedDate({direction: 'prev', unit: 'minute', utcDate: fixedDate})
-    currentDate = fixedDate
-    currentApparentLongitude = getApparentLongitude(bodyKey, currentDate)
-    currentMovementAmount = getCurrentMovementAmount(bodyKey, currentDate, currentApparentLongitude)
-  }
+  fixedDate = util.cloneUTCDate(currentDate)
+  fixedDate = getDirectedDate({direction: 'prev', unit: intervalUnit, utcDate: fixedDate})
+  currentDate = fixedDate
+  currentApparentLongitude = getApparentLongitude(bodyKey, currentDate)
+  currentMovementAmount = getCurrentMovementAmount(bodyKey, currentDate, currentApparentLongitude)
 
 
   let lastDate = currentDate
