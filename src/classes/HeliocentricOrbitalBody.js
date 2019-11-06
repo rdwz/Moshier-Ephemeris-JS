@@ -11,7 +11,8 @@ import { lonlat } from '../utilities/lonlat'
 import { nutation } from '../utilities/nutation'
 import { precess } from '../utilities/precess'
 import { util } from '../utilities/util'
-import { getApparentLongitude, getDirectedDate, getApparentLongitudeDifference } from '../utilities/motion'
+import { getApparentLongitude, getDirectedDate, getApparentLongitudeDifference, calculateNextRetrogradeStation,
+calculateNextDirectStation } from '../utilities/motion'
 import Ephemeris from '../Ephemeris'
 
 export default class HeliocentricOrbitalBody {
@@ -54,26 +55,34 @@ export default class HeliocentricOrbitalBody {
   calculateMotion(body, observer) {
     this.motion = {}
 
-    this.motion.nextSecondApparentLongitudeDifference = getApparentLongitude(body.key, getDirectedDate({direction: "next", unit: "second", utcDate: observer.Date.utc}), observer)
+    this.motion.oneSecondMotionAmount = getApparentLongitudeDifference(this.position.apparentLongitude, getApparentLongitude(body.key, getDirectedDate({direction: "next", unit: "second", utcDate: observer.Date.utc}), observer))
 
-    this.motion.nextSecondApparentLongitudeDifference = getApparentLongitudeDifference(this.position.apparentLongitude, this.motion.nextSecondApparentLongitudeDifference)
+    this.motion.isRetrograde = !!(this.motion.oneSecondMotionAmount <= 0)
 
-    this.motion.isRetrograde = !!(this.motion.nextSecondApparentLongitudeDifference < 0)
+    const nextRetrograde = calculateNextRetrogradeStation({direction: "next", utcDate: observer.Date.utc, bodyKey: body.key, currentApparentLongitude: this.position.apparentLongitude})
 
-    // console.log(this._observer.Date.utc,
-    //   this.position.apparentLongitude,
-    //   this.motion.nextSecondApparentLongitudeDifference, this.motion.nextSecondApparentLongitudeDifference,
-    // this.motion.isRetrograde)
+    this.motion.nextRetrogradeDate = nextRetrograde.date
+    this.motion.nextRetrogradeApparentLongitude = nextRetrograde.apparentLongitude
 
+    const prevRetrograde = calculateNextRetrogradeStation({direction: "prev", utcDate: observer.Date.utc, bodyKey: body.key, currentApparentLongitude: this.position.apparentLongitude})
 
-    this.motion.nextRetrogradeDate
-    this.motion.prevRetrogradeDate
+    this.motion.prevRetrogradeDate = prevRetrograde.date
+    this.motion.prevRetrogradeApparentLongitude = prevRetrograde.apparentLongitude
 
-    this.motion.nextRetrogradeApparentLongitude
-    this.motion.withinPreRetrogradeShadow
+    const nextDirect = calculateNextDirectStation({direction: "next", utcDate: observer.Date.utc, bodyKey: body.key, currentApparentLongitude: this.position.apparentLongitude})
 
-    this.motion.prevRetrogradeApparentLongitude
-    this.motion.withinPostRetrogradeShadow
+    this.motion.nextDirectDate = nextDirect.date
+    this.motion.nextDirectApparentLongitude = nextDirect.apparentLongitude
+
+    const prevDirect = calculateNextDirectStation({direction: "prev", utcDate: observer.Date.utc, bodyKey: body.key, currentApparentLongitude: this.position.apparentLongitude})
+
+    this.motion.prevDirectDate = prevDirect.date
+    this.motion.prevDirectApparentLongitude = prevDirect.apparentLongitude
+
+    this.motion.withinPreRetrogradeShadow = !this.motion.isRetrograde && this.position.apparentLongitude >= this.motion.nextDirectApparentLongitude && this.position.apparentLongitude <= this.motion.nextRetrogradeApparentLongitude
+
+    this.motion.withinPostRetrogradeShadow = !this.motion.isRetrograde && this.position.apparentLongitude >= this.motion.prevDirectApparentLongitude && this.position.apparentLongitude <= this.motion.prevRetrogradeApparentLongitude
+
   }
 
   reduceBody(body, q, e, earthBody, observer) {
