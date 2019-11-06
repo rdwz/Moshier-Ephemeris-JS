@@ -18,7 +18,7 @@ export default class Ephemeris {
     moonQuarterApproximationValue=1.5,
     calculateMotion=true,
     calculateShadows=false,
-    apparentLongitudeOnly=false
+    calcHelioCentricLongitudesOnly=false
   }={}) {
     // Assumes UTC time
     // * int year (> 0 C.E.)
@@ -34,7 +34,7 @@ export default class Ephemeris {
 
     this._key = validateKey(key)
     this._calculateMotion = calculateMotion
-    this._apparentLongitudeOnly = apparentLongitudeOnly
+    this._calcHelioCentricLongitudesOnly = calcHelioCentricLongitudesOnly
     this._calculateShadows = calculateShadows
     this._moonQuarterApproximationValue = moonQuarterApproximationValue
 
@@ -63,15 +63,15 @@ export default class Ephemeris {
     const body = new Body(bodyKey)
     switch(body.type) {
       case 'sun':
-        if (this._apparentLongitudeOnly) return {}
-        return new Sol(body, this.Earth, this.Observer, this._apparentLongitudeOnly)
+        if (this._calcHelioCentricLongitudesOnly) return {}
+        return new Sol(body, this.Earth, this.Observer, this._calcHelioCentricLongitudesOnly)
       case 'luna':
-        if (this._apparentLongitudeOnly) return {}
+        if (this._calcHelioCentricLongitudesOnly) return {}
         return new Luna({body: body, earthBody: this.Earth, observer: this.Observer, quarterApproximationValue: this._moonQuarterApproximationValue})
       case 'heliocentric':
-        return new HeliocentricOrbitalBody(body, this.Earth, this.Observer, this._calculateMotion, this._apparentLongitudeOnly, this._calculateShadows)
+        return new HeliocentricOrbitalBody(body, this.Earth, this.Observer, this._calculateMotion, this._calcHelioCentricLongitudesOnly, this._calculateShadows)
       case 'star':
-        if (this._apparentLongitudeOnly) return {}
+        if (this._calcHelioCentricLongitudesOnly) return {}
         return new Star(body, this.Earth, this.Observer)
       default:
         throw new Error(`Celestial body with key: "${bodyKey}" or type "${body.type}" not found.`)
