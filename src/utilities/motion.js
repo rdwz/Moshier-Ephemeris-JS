@@ -97,20 +97,19 @@ export const calculateNextRetrogradeStation = ({direction='next', bodyKey, utcDa
     }
   } else {
     if (direction === 'next') {
+      // If we're direct, just find the next retrograde moment
       return calculateNextRetrogradeMoment({direction: 'next', bodyKey, utcDate, currentApparentLongitude})
     } else if (direction === 'prev') {
       // Find prev retrograde moment
       const prevRetroMoment = calculateNextRetrogradeMoment({direction: 'prev', bodyKey, utcDate: currentDate, currentApparentLongitude})
 
-      // Skip backwards through entire retrograde to find next direct moment
+      // Skip backwards through entire retrograde cycle to find next direct moment
       const prevDirectMoment = calculateNextDirectMoment({direction: 'prev', bodyKey, utcDate: prevRetroMoment.date, currentApparentLongitude: prevRetroMoment.apparentLongitude})
 
       // Find the first retrograde moment from the other side
       return calculateNextRetrogradeMoment({direction: 'next', bodyKey, utcDate: prevDirectMoment.date, currentApparentLongitude: prevDirectMoment.apparentLongitude})
     }
   }
-
-
 }
 
 export const calculateNextDirectStation = ({direction='next', bodyKey, utcDate, currentApparentLongitude=null}={}) => {
@@ -187,9 +186,10 @@ export const calculateNextRetrogradeMoment = ({bodyKey, utcDate, currentApparent
     currentMovementAmount = getCurrentMovementAmount(bodyKey, currentDate, currentApparentLongitude)
   }
 
-  // NOTE - standardizes the approach to always approach from previous frame.
-  // This is because I've found that calculating the next event can produce varied results when calculating the second of that event from the bottom of the minute (0:00) or the top of the minute (0:59)
-  // For example, approaching from the bottom will find the event at 0:01, and approaching from the top another will find it at 0:50.
+  // NOTE - standardizes the approach to always approach from the past.
+  // This is because I've found that calculating the next event can produce varied results when calculating from either the or the past.
+  // For example, approaching a retrograde event from the past will find the event at 0:01, and approaching from the future another will find it at 0:50.
+  // This seems to be more of an inconsistency or unexpected anomoly in the apparentLongitude calcs than anything else.
   fixedDate = util.cloneUTCDate(currentDate)
   fixedDate = getDirectedDate({direction: 'prev', unit: intervalUnit, utcDate: fixedDate})
   currentDate = fixedDate
@@ -292,6 +292,10 @@ export const calculateNextDirectMoment = ({bodyKey, utcDate, currentApparentLong
     currentMovementAmount = getCurrentMovementAmount(bodyKey, currentDate, currentApparentLongitude)
   }
 
+  // NOTE - standardizes the approach to always approach from the past.
+  // This is because I've found that calculating the next event can produce varied results when calculating from either the or the past.
+  // For example, approaching a retrograde event from the past will find the event at 0:01, and approaching from the future another will find it at 0:50.
+  // This seems to be more of an inconsistency or unexpected anomoly in the apparentLongitude calcs than anything else.
   fixedDate = util.cloneUTCDate(currentDate)
   fixedDate = getDirectedDate({direction: 'prev', unit: intervalUnit, utcDate: fixedDate})
   currentDate = fixedDate
@@ -333,9 +337,6 @@ export const calculateNextDirectMoment = ({bodyKey, utcDate, currentApparentLong
     currentMovementAmount = getCurrentMovementAmount(bodyKey, currentDate, currentApparentLongitude)
   }
 
-  // NOTE - standardizes the final approach to always approach from previous minute.
-  // This is because I've found that calculating the next event can produce varied results when calculating the second of that event from the bottom of the minute (0:00) or the top of the minute (0:59)
-  // For example, approaching from the bottom will find the event at 0:01, and approaching from the top another will find it at 0:50.
   fixedDate = util.cloneUTCDate(currentDate)
   fixedDate = getDirectedDate({direction: 'prev', unit: intervalUnit, utcDate: fixedDate})
   currentDate = fixedDate
