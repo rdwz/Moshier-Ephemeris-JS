@@ -1,6 +1,14 @@
 import Ephemeris from '../Ephemeris'
 import { util } from '../utilities/util'
 
+export const motionEventObject = ({utcDate, apparentLongitude, nextMinuteDifference}={}) => {
+  return ({
+    date: utcDate,
+    apparentLongitude,
+    nextMinuteDifference
+  })
+}
+
 export const getDirectedDate = ({direction = 'next', unit = 'date', utcDate}={}) => {
   // Given a date object, returns next [date or minute] or prev [date or minute] in new date object
   if (!['next', 'prev'].includes(direction)) throw new Error(`Please pass in direction from the following: 'next' or 'prev'. Not "${direction}".`)
@@ -233,4 +241,84 @@ export const calculateNextDirectStation = ({bodyKey, utcDate, currentApparentLon
     }
 
   }
+}
+
+export const calculateNextRetrogradeMoment = ({bodyKey, utcDate, currentApparentLongitude=null, direction='next'}={}) => {
+  if (!['next', 'prev'].includes(direction)) throw new Error(`Please pass in direction from the following: 'next' or 'prev'. Not "${direction}".`)
+
+  if (!currentApparentLongitude) {
+    currentApparentLongitude = getApparentLongitude(bodyKey, utcDate)
+  }
+
+  let currentDate = util.cloneUTCDate(utcDate)
+
+  let currentMovementAmount = getCurrentMovementAmount(bodyKey, utcDate, currentApparentLongitude)
+
+  if (isRetrograde(currentMovementAmount)) return motionEventObject({utcDate: currentDate, apparentLongitude: currentApparentLongitude, nextMinuteDifference: currentMovementAmount})
+
+  while(isDirect(currentMovementAmount)) {
+    // Shifts by 1 day until retrograde date is found
+    currentDate = getDirectedDate({direction, unit: 'date', utcDate: currentDate})
+    currentApparentLongitude = getApparentLongitude(bodyKey, currentDate)
+    currentMovementAmount = getCurrentMovementAmount(bodyKey, currentDate, currentApparentLongitude)
+  }
+
+  let lastDate, lastApparentLongitude, lastMovementAmount
+  while(isRetrograde(currentMovementAmount)) {
+    // Shifts by 1 minute until the last retrograde minute is found
+    // Backwards if looking for next, forwards if looking for prev
+    const tuningDirection = direction === 'next' ? 'prev' : 'next'
+    lastDate = currentDate
+    lastApparentLongitude = currentApparentLongitude
+    lastMovementAmount = currentMovementAmount
+
+    currentDate = getDirectedDate({direction: tuningDirection, unit: 'minute', utcDate: currentDate})
+    currentApparentLongitude = getApparentLongitude(bodyKey, currentDate)
+    currentMovementAmount = getCurrentMovementAmount(bodyKey, currentDate, currentApparentLongitude)
+
+    if (isDirect(currentMovementAmount)) {
+      return motionEventObject({utcDate: lastDate, apparentLongitude: lastApparentLongitude, nextMinuteDifference: lastMovementAmount})
+    }
+  }
+}
+
+
+export const calculateNextDirectMoment = ({bodyKey, utcDate, currentApparentLongitude=null, direction='next'}={}) => {
+  if (!['next', 'prev'].includes(direction)) throw new Error(`Please pass in direction from the following: 'next' or 'prev'. Not "${direction}".`)
+
+  if (!currentApparentLongitude) {
+    currentApparentLongitude = getApparentLongitude(bodyKey, utcDate)
+  }
+
+  let currentDate = util.cloneUTCDate(utcDate)
+
+  let currentMovementAmount = getCurrentMovementAmount(bodyKey, utcDate, currentApparentLongitude)
+
+  if (isDirect(currentMovementAmount)) return motionEventObject({utcDate, apparentLongitude: currentApparentLongitude, nextMinuteDifference: currentMovementAmount})
+
+  while(isRetrograde(currentMovementAmount)) {
+    // Shifts by 1 day until retrograde date is found
+    currentDate = getDirectedDate({direction, unit: 'date', utcDate: currentDate})
+    currentApparentLongitude = getApparentLongitude(bodyKey, currentDate)
+    currentMovementAmount = getCurrentMovementAmount(bodyKey, currentDate, currentApparentLongitude)
+  }
+
+  let lastDate, lastApparentLongitude, lastMovementAmount
+  while(isDirect(currentMovementAmount)) {
+    // Shifts by 1 minute until the last retrograde minute is found
+    // Backwards if looking for next, forwards if looking for prev
+    const tuningDirection = direction === 'next' ? 'prev' : 'next'
+    lastDate = currentDate
+    lastApparentLongitude = currentApparentLongitude
+    lastMovementAmount = currentMovementAmount
+
+    currentDate = getDirectedDate({direction: tuningDirection, unit: 'minute', utcDate: currentDate})
+    currentApparentLongitude = getApparentLongitude(bodyKey, currentDate)
+    currentMovementAmount = getCurrentMovementAmount(bodyKey, currentDate, currentApparentLongitude)
+
+    if (isRetrograde(currentMovementAmount)) {
+      return motionEventObject({utcDate: lastDate, apparentLongitude: lastApparentLongitude, nextMinuteDifference: lastMovementAmount})
+    }
+  }
+
 }

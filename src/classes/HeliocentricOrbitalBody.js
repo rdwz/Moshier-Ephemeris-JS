@@ -11,7 +11,7 @@ import { lonlat } from '../utilities/lonlat'
 import { nutation } from '../utilities/nutation'
 import { precess } from '../utilities/precess'
 import { util } from '../utilities/util'
-import { getNextApparentLongitude, getDirectedDate, getApparentLongitudeDifference } from '../utilities/motion'
+import { getApparentLongitude, getDirectedDate, getApparentLongitudeDifference } from '../utilities/motion'
 import Ephemeris from '../Ephemeris'
 
 export default class HeliocentricOrbitalBody {
@@ -47,7 +47,7 @@ export default class HeliocentricOrbitalBody {
   calculateMotion(body, observer) {
     this.motion = {}
 
-    this.motion.nextMinuteApparentLongitude = getNextApparentLongitude(body.key, getDirectedDate({direction: "next", unit: "minute", utcDate: observer.Date.utc}), observer)
+    this.motion.nextMinuteApparentLongitude = getApparentLongitude(body.key, getDirectedDate({direction: "next", unit: "minute", utcDate: observer.Date.utc}), observer)
 
     this.motion.nextMinuteApparentLongitudeDifference = getApparentLongitudeDifference(this.position.apparentLongitude, this.motion.nextMinuteApparentLongitude)
 

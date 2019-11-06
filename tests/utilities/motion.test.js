@@ -1,4 +1,4 @@
-import {getDirectedDate, calculateNextRetrogradeStation, calculateNextDirectStation } from '../../src/utilities/motion'
+import {getDirectedDate, calculateNextRetrogradeStation, calculateNextDirectStation, calculateNextRetrogradeMoment, calculateNextDirectMoment } from '../../src/utilities/motion'
 
 describe('getDirectedDate', () => {
   const utcDate = new Date(Date.UTC(2019, 9, 31, 0, 0)) // 10/31/2019 midnight UTC
@@ -87,6 +87,99 @@ describe('calculateNextDirectStation', () => {
       expect(station.apparentLongitude).toEqual(221.58646545546335)
       expect(station.nextMinuteDifference).toEqual(6.07640515681851e-8)
 
+    })
+  })
+})
+
+describe('calculateNextRetrogradeMoment', () => {
+  describe('in a direct datetime', () => {
+    describe('next', () => {
+
+      it('finds the next retrograde moment', () => {
+        const utcDate = new Date(Date.UTC(2019, 9, 31, 0, 0)) // direct 10/31/2019 midnight UTC
+
+        const moment = calculateNextRetrogradeMoment({bodyKey: 'mercury', utcDate, direction: 'next'})
+
+        expect(moment.date).toEqual(new Date("2019-10-31T15:43:00.000Z")) // 10/31/2019 15:43 UTC
+
+        expect(moment.apparentLongitude).toEqual(237.6378590821993)
+        expect(moment.nextMinuteDifference).toEqual(-5.9122839957126416e-8)
+
+      })
+    })
+
+    describe('prev', () => {
+      it('finds the prev retrograde moment', () => {
+        const utcDate = new Date(Date.UTC(2019, 9, 31, 0, 0)) // direct 10/31/2019 midnight UTC
+
+        const moment = calculateNextRetrogradeMoment({bodyKey: 'mercury', utcDate, direction: 'prev'})
+
+        expect(moment.date).toEqual(new Date("2019-08-01T03:58:00.000Z")) // 8/01/2019 03:58 UTC
+
+        expect(moment.apparentLongitude).toEqual(113.94763606957291)
+        expect(moment.nextMinuteDifference).toEqual(-2.304301460753777e-8)
+
+      })
+    })
+  })
+
+  describe('in a retrograde datetime', () => {
+    it('returns the given retrograde moment', () => {
+      const utcDate = new Date(Date.UTC(2019, 9, 31, 20, 0)) // retrograde on 10/31/2019 20:00 UTC
+
+      const moment = calculateNextRetrogradeMoment({bodyKey: 'mercury', utcDate})
+
+      expect(moment.date).toEqual(new Date("2019-10-31T20:00:00.000Z")) // 10/31/2019 20:00 UTC
+
+      expect(moment.apparentLongitude).toEqual(237.63563852193388)
+      expect(moment.nextMinuteDifference).toEqual(-0.000017324499765436485)
+    })
+  })
+})
+
+describe('calculateNextDirectMoment', () => {
+  describe('in a direct datetime', () => {
+    it('returns the given direct moment', () => {
+      const utcDate = new Date(Date.UTC(2019, 9, 31, 0, 0)) // direct 10/31/2019 midnight UTC
+
+      const moment = calculateNextDirectMoment({bodyKey: 'mercury', utcDate})
+
+      expect(moment.date).toEqual(new Date("2019-10-31T00:00:00.000Z")) // 10/31/2019 00:00 UTC
+
+      expect(moment.apparentLongitude).toEqual(237.60866592301215)
+      expect(moment.nextMinuteDifference).toEqual(0.00006141062385722762)
+
+    })
+  })
+
+  describe('in a retrograde datetime', () => {
+    describe('next', () => {
+
+      it('finds the next direct moment', () => {
+        const utcDate = new Date(Date.UTC(2019, 9, 31, 20, 0)) // retrograde on 10/31/2019 20:00 UTC
+
+        const moment = calculateNextDirectMoment({bodyKey: 'mercury', utcDate, direction: 'next'})
+
+        expect(moment.date).toEqual(new Date("2019-11-20T19:13:00.000Z")) // 11/20/2019 19:13 UTC
+
+        expect(moment.apparentLongitude).toEqual(221.58646545546335)
+        expect(moment.nextMinuteDifference).toEqual(6.07640515681851e-8)
+
+      })
+    })
+
+    describe('prev', () => {
+      it('finds the prev direct moment', () => {
+        const utcDate = new Date(Date.UTC(2019, 9, 31, 20, 0)) // retrograde on 10/31/2019 20:00 UTC
+
+        const moment = calculateNextDirectMoment({bodyKey: 'mercury', utcDate, direction: 'prev'})
+
+        expect(moment.date).toEqual(new Date("2019-10-31T15:42:00.000Z")) // 10/31/2019 15:42 UTC
+
+        expect(moment.apparentLongitude).toEqual(237.63785907456202)
+        expect(moment.nextMinuteDifference).toEqual(7.637282806172152e-9)
+
+      })
     })
   })
 })
