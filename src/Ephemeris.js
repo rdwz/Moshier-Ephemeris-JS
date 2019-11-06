@@ -16,7 +16,9 @@ export default class Ephemeris {
     latitude=0.00, longitude=0.00, height=0.00,
     key=undefined,
     moonQuarterApproximationValue=1.5,
-    calculateMotion=true
+    calculateMotion=true,
+    apparentLongitudeOnly=false,
+    calculateShadows=false
   }={}) {
     // Assumes UTC time
     // * int year (> 0 C.E.)
@@ -32,6 +34,8 @@ export default class Ephemeris {
 
     this._key = validateKey(key)
     this._calculateMotion = calculateMotion
+    this._apparentLongitudeOnly = apparentLongitudeOnly
+    this._calculateShadows = calculateShadows
     this._moonQuarterApproximationValue = moonQuarterApproximationValue
 
     this.Observer = new Observer({latitude: latitude, longitude: longitude, height: height, year: year, month: month, day: day, hours: hours, minutes: minutes, seconds: seconds })
@@ -63,7 +67,7 @@ export default class Ephemeris {
       case 'luna':
         return new Luna({body: body, earthBody: this.Earth, observer: this.Observer, quarterApproximationValue: this._moonQuarterApproximationValue})
       case 'heliocentric':
-        return new HeliocentricOrbitalBody(body, this.Earth, this.Observer, this._calculateMotion)
+        return new HeliocentricOrbitalBody(body, this.Earth, this.Observer, this._calculateMotion, this._apparentLongitudeOnly, this._calculateShadows)
       case 'star':
         return new Star(body, this.Earth, this.Observer)
       default:

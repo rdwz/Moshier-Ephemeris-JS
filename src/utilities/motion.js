@@ -32,6 +32,7 @@ export const getDirectedDate = ({direction = 'next', unit = 'date', utcDate}={})
 }
 
 const getCurrentMovementAmount = (bodyKey, utcDate, currentApparentLongitude) => {
+  if (!bodyKey) throw new Error('Please provide a celestial body key. Ex: "mercury".')
   if (!currentApparentLongitude) {
     currentApparentLongitude = getApparentLongitude(bodyKey, utcDate)
   }
@@ -48,6 +49,7 @@ const isDirect = movementAmount => {
 }
 
 export const getApparentLongitude = (bodyKey, utcDate) => {
+  if (!bodyKey) throw new Error('Please provide a celestial body key. Ex: "mercury".')
   // Lat / lng / height does not matter in determining apparent longitude of celestial body as long as UTC datetime is passed in.
   return new Ephemeris(
     {
@@ -58,7 +60,8 @@ export const getApparentLongitude = (bodyKey, utcDate) => {
       minutes: utcDate.getUTCMinutes(),
       seconds: utcDate.getUTCSeconds(),
       key: bodyKey,
-      calculateMotion: false
+      calculateMotion: false,
+      apparentLongitudeOnly: true
     }
   )[bodyKey].position.apparentLongitude
 }

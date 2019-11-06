@@ -16,7 +16,7 @@ calculateNextDirectStation } from '../utilities/motion'
 import Ephemeris from '../Ephemeris'
 
 export default class HeliocentricOrbitalBody {
-  constructor(body, earthBody, observer, calculateMotion) {
+  constructor(body, earthBody, observer, calculateMotion, apparentLongitudeOnly=false, calculateShadows=false) {
     /////////
     // body = <object> - one of the bodies from celestialBodies.js
     // earthBody = <object> - an instance of the Earth.js class
@@ -27,7 +27,7 @@ export default class HeliocentricOrbitalBody {
     this._earthBody = earthBody
     this._observer = observer
     this._calculateMotion = calculateMotion
-    this._body = this.calculateBody(body, this._earthBody, this._observer)
+    this._body = this.calculateBody(body, this._earthBody, this._observer, apparentLongitudeOnly)
     Object.keys(this._body).filter(k => k !== '_body').forEach(key => {
       this[key] = this._body[key]
     })
@@ -37,11 +37,11 @@ export default class HeliocentricOrbitalBody {
     this.calculateMotion = this.calculateMotion.bind(this)
 
     if (calculateMotion) {
-      this.calculateMotion(body, observer)
+      this.calculateMotion(body, observer, calculateShadows)
     }
   }
 
-  calculateBody(body, earthBody, observer) {
+  calculateBody(body, earthBody, observer, apparentLongitudeOnly=false) {
     if (!body.semiAxis) {
   		body.semiAxis = body.perihelionDistance / (1 - body.eccentricity);
   	}
@@ -49,43 +49,44 @@ export default class HeliocentricOrbitalBody {
   	/* calculate heliocentric position of the object */
   	body = kepler.calc(observer.Date.julian, body); // NOTE mutates body
   	/* apply correction factors and print apparent place */
-  	return this.reduceBody(body, body.position.rect, earthBody.position.rect, earthBody, observer);
+  	return this.reduceBody(body, body.position.rect, earthBody.position.rect, earthBody, observer, apparentLongitudeOnly);
   }
 
-  calculateMotion(body, observer) {
+  calculateMotion(body, observer, calculateShadows=false) {
     this.motion = {}
 
     this.motion.oneSecondMotionAmount = getApparentLongitudeDifference(this.position.apparentLongitude, getApparentLongitude(body.key, getDirectedDate({direction: "next", unit: "second", utcDate: observer.Date.utc}), observer))
 
     this.motion.isRetrograde = !!(this.motion.oneSecondMotionAmount <= 0)
 
-    const nextRetrograde = calculateNextRetrogradeStation({direction: "next", utcDate: observer.Date.utc, bodyKey: body.key, currentApparentLongitude: this.position.apparentLongitude})
+    if (calculateShadows) {
+      const nextRetrograde = calculateNextRetrogradeStation({direction: "next", utcDate: observer.Date.utc, bodyKey: body.key, currentApparentLongitude: this.position.apparentLongitude})
 
-    this.motion.nextRetrogradeDate = nextRetrograde.date
-    this.motion.nextRetrogradeApparentLongitude = nextRetrograde.apparentLongitude
+      this.motion.nextRetrogradeDate = nextRetrograde.date
+      this.motion.nextRetrogradeApparentLongitude = nextRetrograde.apparentLongitude
 
-    const prevRetrograde = calculateNextRetrogradeStation({direction: "prev", utcDate: observer.Date.utc, bodyKey: body.key, currentApparentLongitude: this.position.apparentLongitude})
+      const prevRetrograde = calculateNextRetrogradeStation({direction: "prev", utcDate: observer.Date.utc, bodyKey: body.key, currentApparentLongitude: this.position.apparentLongitude})
 
-    this.motion.prevRetrogradeDate = prevRetrograde.date
-    this.motion.prevRetrogradeApparentLongitude = prevRetrograde.apparentLongitude
+      this.motion.prevRetrogradeDate = prevRetrograde.date
+      this.motion.prevRetrogradeApparentLongitude = prevRetrograde.apparentLongitude
 
-    const nextDirect = calculateNextDirectStation({direction: "next", utcDate: observer.Date.utc, bodyKey: body.key, currentApparentLongitude: this.position.apparentLongitude})
+      const nextDirect = calculateNextDirectStation({direction: "next", utcDate: observer.Date.utc, bodyKey: body.key, currentApparentLongitude: this.position.apparentLongitude})
 
-    this.motion.nextDirectDate = nextDirect.date
-    this.motion.nextDirectApparentLongitude = nextDirect.apparentLongitude
+      this.motion.nextDirectDate = nextDirect.date
+      this.motion.nextDirectApparentLongitude = nextDirect.apparentLongitude
 
-    const prevDirect = calculateNextDirectStation({direction: "prev", utcDate: observer.Date.utc, bodyKey: body.key, currentApparentLongitude: this.position.apparentLongitude})
+      const prevDirect = calculateNextDirectStation({direction: "prev", utcDate: observer.Date.utc, bodyKey: body.key, currentApparentLongitude: this.position.apparentLongitude})
 
-    this.motion.prevDirectDate = prevDirect.date
-    this.motion.prevDirectApparentLongitude = prevDirect.apparentLongitude
+      this.motion.prevDirectDate = prevDirect.date
+      this.motion.prevDirectApparentLongitude = prevDirect.apparentLongitude
 
-    this.motion.withinPreRetrogradeShadow = !this.motion.isRetrograde && this.position.apparentLongitude >= this.motion.nextDirectApparentLongitude && this.position.apparentLongitude <= this.motion.nextRetrogradeApparentLongitude
+      this.motion.withinPreRetrogradeShadow = !this.motion.isRetrograde && this.position.apparentLongitude >= this.motion.nextDirectApparentLongitude && this.position.apparentLongitude <= this.motion.nextRetrogradeApparentLongitude
 
-    this.motion.withinPostRetrogradeShadow = !this.motion.isRetrograde && this.position.apparentLongitude >= this.motion.prevDirectApparentLongitude && this.position.apparentLongitude <= this.motion.prevRetrogradeApparentLongitude
-
+      this.motion.withinPostRetrogradeShadow = !this.motion.isRetrograde && this.position.apparentLongitude >= this.motion.prevDirectApparentLongitude && this.position.apparentLongitude <= this.motion.prevRetrogradeApparentLongitude
+    }
   }
 
-  reduceBody(body, q, e, earthBody, observer) {
+  reduceBody(body, q, e, earthBody, observer, apparentLongitudeOnly=false) {
   	var p = [], temp = [], polar = []; // double
   	var a, b, r, s, x; // double
   	var i; // int
@@ -96,9 +97,11 @@ export default class HeliocentricOrbitalBody {
   		temp[i] = q[i];
   	}
 
-  	/* Display ecliptic longitude and latitude, precessed to equinox
-  	 of date.  */
-  	body.equinoxEclipticLonLat = lonlat.calc(q, observer.Date, polar, 1 );
+    if (!apparentLongitudeOnly) {
+      /* Display ecliptic longitude and latitude, precessed to equinox
+      of date.  */
+      body.equinoxEclipticLonLat = lonlat.calc(q, observer.Date, polar, 1 );
+    }
 
   	/* Adjust for light time (planetary aberration)
   	 */
@@ -110,47 +113,51 @@ export default class HeliocentricOrbitalBody {
   		p[i] = q[i] - e[i];
   	}
 
-  	body = util.angles( p, q, e, body );
+  	body = util.angles( p, q, e, body ); // NOTE mutates body
 
-  	a = 0.0;
-  	for( i=0; i<3; i++ ) {
-  		b = temp[i] - e[i];
-  		a += b * b;
-  	}
-  	a = Math.sqrt(a);
-  	body.position.trueGeocentricDistance = a; /* was EO */
-  	body.position.equatorialDiameter = 2.0*body.semiDiameter / body.locals.EO;
+    if (!apparentLongitudeOnly) {
+    	a = 0.0;
+    	for( i=0; i<3; i++ ) {
+    		b = temp[i] - e[i];
+    		a += b * b;
+    	}
+    	a = Math.sqrt(a);
 
-  	/* Calculate radius.
-  	 */
-  	r = 0.0;
-  	x = 0.0;
-  	for( i=0; i<3; i++ ) {
-  		x = p[i];
-  		r += x * x;
-  	}
-  	r = Math.sqrt(r);
+      body.position.trueGeocentricDistance = a; /* was EO */
+    	body.position.equatorialDiameter = 2.0*body.semiDiameter / body.locals.EO;
 
-  	/* Calculate visual magnitude.
-  	 * "Visual" refers to the spectrum of visible light.
-  	 * Phase = 0.5(1+pq) = geometric fraction of disc illuminated.
-  	 * where pq = cos( sun-object-earth angle )
-  	 * The magnitude is
-  	 *    V(1,0) + 2.5 log10( SE^2 SO^2 / Phase)
-  	 * where V(1,0) = elemnt->mag is the magnitude at 1au from
-  	 * both earth and sun and 100% illumination.
-  	 */
-  	a = 0.5 * (1.0 + body.locals.pq);
-  	/* Fudge the phase for light leakage in magnitude estimation.
-  	 * Note this phase term estimate does not reflect reality well.
-  	 * Calculated magnitudes of Mercury and Venus are inaccurate.
-  	 */
-  	b = 0.5 * (1.01 + 0.99*body.locals.pq);
-  	s = body.magnitude + 2.1715 * Math.log( body.locals.EO * body.locals.SO ) - 1.085 * Math.log(b);
-  	body.position.approxVisual = {
-  		magnitude: s,
-  		phase: a
-  	};
+    	/* Calculate radius.
+    	 */
+    	r = 0.0;
+    	x = 0.0;
+    	for( i=0; i<3; i++ ) {
+    		x = p[i];
+    		r += x * x;
+    	}
+    	r = Math.sqrt(r);
+
+
+    	/* Calculate visual magnitude.
+    	 * "Visual" refers to the spectrum of visible light.
+    	 * Phase = 0.5(1+pq) = geometric fraction of disc illuminated.
+    	 * where pq = cos( sun-object-earth angle )
+    	 * The magnitude is
+    	 *    V(1,0) + 2.5 log10( SE^2 SO^2 / Phase)
+    	 * where V(1,0) = elemnt->mag is the magnitude at 1au from
+    	 * both earth and sun and 100% illumination.
+    	 */
+    	a = 0.5 * (1.0 + body.locals.pq);
+    	/* Fudge the phase for light leakage in magnitude estimation.
+    	 * Note this phase term estimate does not reflect reality well.
+    	 * Calculated magnitudes of Mercury and Venus are inaccurate.
+    	 */
+    	b = 0.5 * (1.01 + 0.99*body.locals.pq);
+    	s = body.magnitude + 2.1715 * Math.log( body.locals.EO * body.locals.SO ) - 1.085 * Math.log(b);
+    	body.position.approxVisual = {
+    		magnitude: s,
+    		phase: a
+    	};
+    } // END apparentLongitudeOnly
 
   	/* Find unit vector from earth in direction of object
   	 */
@@ -161,25 +168,22 @@ export default class HeliocentricOrbitalBody {
 
   	/* Report astrometric position
   	 */
-  	body.position.astrometricJ2000 = util.showrd (p, polar );
+    if (!apparentLongitudeOnly) {
+    	body.position.astrometricJ2000 = util.showrd (p, polar );
+      /* Also in 1950 coordinates */
+      temp = precess.calc ( temp, B1950, -1 );
+      body.position.astrometricB1950 = util.showrd (temp, polar );
+    } // END apparentLongitudeOnly
 
-  	/* Also in 1950 coordinates
-  	 */
-  	temp = precess.calc ( temp, B1950, -1 );
-  	body.position.astrometricB1950 = util.showrd (temp, polar );
+  	/* Correct position for light deflection */
+  	body.position.deflection = deflection.calc ( p, q, e, body ); // relativity NOTE - mutates p
 
-  	/* Correct position for light deflection
-  	 */
-  	body.position.deflection = deflection.calc ( p, q, e, body ); // relativity
-
-  	/* Correct for annual aberration
-  	 */
-  	body.position.aberration = aberration.calc(p, earthBody, observer, body);
-
+  	/* Correct for annual aberration */
+    	body.position.aberration = aberration.calc(p, earthBody, observer, body); // NOTE - mutates p
   	/* Precession of the equinox and ecliptic
   	 * from J2000.0 to ephemeris date
   	 */
-  	p = precess.calc( p, observer.Date.julian, -1 );
+    	p = precess.calc( p, observer.Date.julian, -1 ); // NOTE - mutates p
 
   	/* Ajust for nutation
   	 * at current ecliptic.
@@ -188,18 +192,24 @@ export default class HeliocentricOrbitalBody {
   	// const epsilonObject = new Epsilon(observer.Date.julian); // NOTE - has no affect on result
   	body.position.nutation = nutation.calc ( observer.Date, p ); // NOTE mutates p
 
-  	/* Display the final apparent R.A. and Dec.
-  	 * for equinox of date.
-  	 */
-  	body.position.constellation = constellation.calc (p, observer.Date);
-  	body.position.apparent = util.showrd(p, polar);
+    if (!apparentLongitudeOnly) {
+  	   body.position.constellation = constellation.calc(p, observer.Date);
+    } // END apparentLongitudeOnly
+
+    /* Display the final apparent R.A. and Dec.
+    * for equinox of date.
+    */
+
+    if (!apparentLongitudeOnly) {
+  	   body.position.apparent = util.showrd(p, polar);
+    } // END apparentLongitudeOnly
 
   	/* Geocentric ecliptic longitude and latitude.  */
   	for( i=0; i<3; i++ ) {
   		p[i] *= body.locals.EO;
   	}
   	body.position.apparentGeocentric = lonlat.calc ( p, observer.Date, temp, 0 );
-  	body.position.apparentLongitude = body.position.apparentGeocentric [0] * RTD;
+  	body.position.apparentLongitude = body.position.apparentGeocentric[0] * RTD;
   	body.position.apparentLongitudeString =
   		body.position.apparentGeocentric [3].degree + '\u00B0' +
   		body.position.apparentGeocentric [3].minutes + '\'' +
@@ -212,12 +222,13 @@ export default class HeliocentricOrbitalBody {
   		Math.floor(body.position.apparentGeocentric [3].seconds) + '"'
   	;
 
-  	body.position.geocentricDistance = r;
+    if (!apparentLongitudeOnly) {
+    	body.position.geocentricDistance = r;
 
-  	/* Go do topocentric reductions.
-  	 */
-  	polar[2] = body.locals.EO;
-  	body.position.altaz = altaz.calc(polar, observer.Date, body, observer);
+    	/* Go do topocentric reductions. */
+    	polar[2] = body.locals.EO;
+    	body.position.altaz = altaz.calc(polar, observer.Date, body, observer);
+    } // END apparentLongitudeOnly
 
     return body
   }
