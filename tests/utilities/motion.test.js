@@ -8,7 +8,7 @@ describe('getDirectedDate', () => {
     })
 
     it('throws invalid unit error', () => {
-      expect(() => getDirectedDate({direction: 'next', unit: 'bad unit', utcDate})).toThrowError("Please pass in unit from the following: 'date' or 'minute'. Not \"bad unit\".")
+      expect(() => getDirectedDate({direction: 'next', unit: 'bad unit', utcDate})).toThrowError("Please pass in unit from the following: 'date', 'minute', or 'second'. Not \"bad unit\".")
     })
   })
 
@@ -20,7 +20,12 @@ describe('getDirectedDate', () => {
 
     it('finds the next minute', () => {
       const newDate = getDirectedDate({direction: 'next', unit: 'minute', utcDate})
-      expect(newDate).toEqual(new Date("2019-10-31T00:01:00.000Z")) // 10/31/2019 00:01 UTC
+      expect(newDate).toEqual(new Date("2019-10-31T00:01:00.000Z")) // 10/31/2019 00:01:00 UTC
+    })
+
+    it('finds the next second', () => {
+      const newDate = getDirectedDate({direction: 'next', unit: 'second', utcDate})
+      expect(newDate).toEqual(new Date("2019-10-31T00:00:01.000Z")) // 10/31/2019 00:00:01 UTC
     })
   })
 
@@ -46,7 +51,7 @@ describe('calculateNextRetrogradeStation', () => {
 
       expect(station.date).toEqual(new Date("2019-10-31T15:43:00.000Z")) // 10/31/2019 15:43 UTC
       expect(station.apparentLongitude).toEqual(237.6378590821993)
-      expect(station.nextMinuteDifference).toEqual(-5.9122839957126416e-8)
+      expect(station.nextMovementAmount).toEqual(-5.9122839957126416e-8)
 
     })
   })
@@ -59,7 +64,7 @@ describe('calculateNextRetrogradeStation', () => {
 
       expect(station.date).toEqual(new Date("2020-02-17T00:55:00.000Z")) // 2/17/2020 00:55 UTC
       expect(station.apparentLongitude).toEqual(342.88971141933405)
-      expect(station.nextMinuteDifference).toEqual(-2.8375666261126753e-8)
+      expect(station.nextMovementAmount).toEqual(-2.8375666261126753e-8)
 
     })
   })
@@ -73,7 +78,7 @@ describe('calculateNextDirectStation', () => {
 
       expect(station.date).toEqual(new Date("2019-11-20T19:13:00.000Z")) // 11/20/2019 19:13 UTC
       expect(station.apparentLongitude).toEqual(221.58646545546335)
-      expect(station.nextMinuteDifference).toEqual(6.07640515681851e-8)
+      expect(station.nextMovementAmount).toEqual(6.07640515681851e-8)
 
     })
   })
@@ -85,7 +90,7 @@ describe('calculateNextDirectStation', () => {
 
       expect(station.date).toEqual(new Date("2019-11-20T19:13:00.000Z")) // 11/20/2019 19:13 UTC
       expect(station.apparentLongitude).toEqual(221.58646545546335)
-      expect(station.nextMinuteDifference).toEqual(6.07640515681851e-8)
+      expect(station.nextMovementAmount).toEqual(6.07640515681851e-8)
 
     })
   })
@@ -100,10 +105,10 @@ describe('calculateNextRetrogradeMoment', () => {
 
         const moment = calculateNextRetrogradeMoment({bodyKey: 'mercury', utcDate, direction: 'next'})
 
-        expect(moment.date).toEqual(new Date("2019-10-31T15:43:00.000Z")) // 10/31/2019 15:43 UTC
+        expect(moment.date).toEqual(new Date("2019-10-31T15:42:26.000Z")) // 10/31/2019 15:42:25 UTC
 
-        expect(moment.apparentLongitude).toEqual(237.6378590821993)
-        expect(moment.nextMinuteDifference).toEqual(-5.9122839957126416e-8)
+        expect(moment.apparentLongitude).toEqual(237.6378590865681)
+        expect(moment.nextMovementAmount).toEqual(-1.4779288903810084e-12)
 
       })
     })
@@ -114,10 +119,10 @@ describe('calculateNextRetrogradeMoment', () => {
 
         const moment = calculateNextRetrogradeMoment({bodyKey: 'mercury', utcDate, direction: 'prev'})
 
-        expect(moment.date).toEqual(new Date("2019-08-01T03:58:00.000Z")) // 8/01/2019 03:58 UTC
+        expect(moment.date).toEqual(new Date("2019-08-01T03:59:22.000Z")) // 8/01/2019 03:59:23 UTC
 
-        expect(moment.apparentLongitude).toEqual(113.94763606957291)
-        expect(moment.nextMinuteDifference).toEqual(-2.304301460753777e-8)
+        expect(moment.apparentLongitude).toEqual(113.94763605057734)
+        expect(moment.nextMovementAmount).toEqual(-7.673861546209082e-13)
 
       })
     })
@@ -132,7 +137,7 @@ describe('calculateNextRetrogradeMoment', () => {
       expect(moment.date).toEqual(new Date("2019-10-31T20:00:00.000Z")) // 10/31/2019 20:00 UTC
 
       expect(moment.apparentLongitude).toEqual(237.63563852193388)
-      expect(moment.nextMinuteDifference).toEqual(-0.000017324499765436485)
+      expect(moment.nextMovementAmount).toEqual(-2.883943750475737e-7)
     })
   })
 })
@@ -147,7 +152,7 @@ describe('calculateNextDirectMoment', () => {
       expect(moment.date).toEqual(new Date("2019-10-31T00:00:00.000Z")) // 10/31/2019 00:00 UTC
 
       expect(moment.apparentLongitude).toEqual(237.60866592301215)
-      expect(moment.nextMinuteDifference).toEqual(0.00006141062385722762)
+      expect(moment.nextMovementAmount).toEqual(0.0000010243777808227605)
 
     })
   })
@@ -160,10 +165,10 @@ describe('calculateNextDirectMoment', () => {
 
         const moment = calculateNextDirectMoment({bodyKey: 'mercury', utcDate, direction: 'next'})
 
-        expect(moment.date).toEqual(new Date("2019-11-20T19:13:00.000Z")) // 11/20/2019 19:13 UTC
+        expect(moment.date).toEqual(new Date("2019-11-20T19:12:37.000Z")) // 11/20/2019 19:13 UTC
 
-        expect(moment.apparentLongitude).toEqual(221.58646545546335)
-        expect(moment.nextMinuteDifference).toEqual(6.07640515681851e-8)
+        expect(moment.apparentLongitude).toEqual(221.58646545567194)
+        expect(moment.nextMovementAmount).toEqual(2.8421709430404007e-11)
 
       })
     })
@@ -174,10 +179,10 @@ describe('calculateNextDirectMoment', () => {
 
         const moment = calculateNextDirectMoment({bodyKey: 'mercury', utcDate, direction: 'prev'})
 
-        expect(moment.date).toEqual(new Date("2019-10-31T15:42:00.000Z")) // 10/31/2019 15:42 UTC
+        expect(moment.date).toEqual(new Date("2019-10-31T15:42:54.000Z")) // 10/31/2019 15:42 UTC
 
-        expect(moment.apparentLongitude).toEqual(237.63785907456202)
-        expect(moment.nextMinuteDifference).toEqual(7.637282806172152e-9)
+        expect(moment.apparentLongitude).toEqual(237.63785908449577)
+        expect(moment.nextMovementAmount).toEqual(3.271338755439501e-11)
 
       })
     })

@@ -47,15 +47,15 @@ export default class HeliocentricOrbitalBody {
   calculateMotion(body, observer) {
     this.motion = {}
 
-    this.motion.nextMinuteApparentLongitude = getApparentLongitude(body.key, getDirectedDate({direction: "next", unit: "minute", utcDate: observer.Date.utc}), observer)
+    this.motion.nextSecondApparentLongitudeDifference = getApparentLongitude(body.key, getDirectedDate({direction: "next", unit: "minute", utcDate: observer.Date.utc}), observer)
 
-    this.motion.nextMinuteApparentLongitudeDifference = getApparentLongitudeDifference(this.position.apparentLongitude, this.motion.nextMinuteApparentLongitude)
+    this.motion.nextSecondApparentLongitudeDifference = getApparentLongitudeDifference(this.position.apparentLongitude, this.motion.nextSecondApparentLongitudeDifference)
 
-    this.motion.isRetrograde = !!(this.motion.nextMinuteApparentLongitudeDifference < 0)
+    this.motion.isRetrograde = !!(this.motion.nextSecondApparentLongitudeDifference < 0)
 
     // console.log(this._observer.Date.utc,
     //   this.position.apparentLongitude,
-    //   this.motion.nextMinuteApparentLongitude, this.motion.nextMinuteApparentLongitudeDifference,
+    //   this.motion.nextSecondApparentLongitudeDifference, this.motion.nextSecondApparentLongitudeDifference,
     // this.motion.isRetrograde)
 
 
