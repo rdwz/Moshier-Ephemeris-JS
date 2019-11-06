@@ -31,6 +31,9 @@ export default class Ephemeris {
     // * float longitude (-180 - +180)
     // * float height
     // * string OR array[string] key - ex: pass in "venus" or ["mercury", "venus"] or leave blank for all
+    // * bool calculateMotion - whether or not this ephemeris instance should calculate how much the heliocentric bodies have moved in their orbits 1 second from now. Used for retrograde calculation. ** Requires a new instance of Ephemeris so disable if not needed for small performance boost **
+    // * bool calculateShadows - flag for calculating whether or not heliocentric bodies are within a retrograde shadow period or not. ** Huge performance impact ** - disable unless needed.
+    // * bool calcHeliocentricLongitudesOnly - flag for eliminating certain unnecessary calculations in the process of calculating the retrograde shadows. If enabled, only calculates the apparentLongitude of heliocentric bodies and skips Sun, Luna, Stars, etc.
 
     this._key = validateKey(key)
     this._calculateMotion = calculateMotion
