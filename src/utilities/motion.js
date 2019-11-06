@@ -2,7 +2,7 @@ import Ephemeris from '../Ephemeris'
 import { util } from '../utilities/util'
 
 const averageRetrogradeTable = (bodyKey) => {
-  // should be equal to average length of the retrograde period
+  // use a conservative number for the average length of the retrograde period
   // some guidance http://www.angelfire.com/planet/astrology6/
   switch(bodyKey) {
     case 'mercury':
@@ -92,11 +92,11 @@ const getMotion = (bodyKey, utcDate) => {
 }
 
 const isRetrograde = movementAmount => {
-  return movementAmount <= 0
+  return movementAmount <= 0 // Yes, some planets do land on 0. for example: Saturn on 2020-05-11T04:10:02.000Z
 }
 
 const isDirect = movementAmount => {
-  return movementAmount >= 0
+  return movementAmount > 0
 }
 
 export const getApparentLongitude = (bodyKey, utcDate) => {
@@ -189,14 +189,13 @@ export const calculateNextDirectStation = ({direction='next', bodyKey, utcDate, 
 
   let currentMovementAmount = getCurrentMovementAmount(bodyKey, utcDate, currentApparentLongitude)
 
-
   if (isDirect(currentMovementAmount)) {
     if (direction === 'next') {
-      // Skip to end of current retrograde if movement indicates we're in one
-      // and find the next retrograde moment from there
-      const nextDirectMoment = calculateNextRetrogradeMoment({direction: 'next', bodyKey, utcDate: currentDate, currentApparentLongitude})
+      // Skip to end of current direct phase
+      // and find the next direct moment from there
+      const nextRetrogradeMoment = calculateNextRetrogradeMoment({direction: 'next', bodyKey, utcDate: currentDate, currentApparentLongitude})
 
-      return calculateNextDirectMoment({direction: 'next', bodyKey, utcDate: nextDirectMoment.date, currentApparentLongitude: nextDirectMoment.apparentLongitude})
+      return calculateNextDirectMoment({direction: 'next', bodyKey, utcDate: nextRetrogradeMoment.date, currentApparentLongitude: nextRetrogradeMoment.apparentLongitude})
 
     } else if (direction === 'prev') {
       // Skip backwards through entire retrograde to find next direct moment
