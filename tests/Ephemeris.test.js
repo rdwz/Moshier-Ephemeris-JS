@@ -917,6 +917,51 @@ describe('Ephemeris', () => {
 
       expect(body.position.constellation).toEqual("Cap Capricorni");
     })
+
+    it ('calculates motion pre-retrograde', () => {
+      ephemeris = new Ephemeris({...defaultOrigin, year: 2019, month: 7, day: 10, key: 'uranus', calculateShadows: true})
+      body = ephemeris.uranus
+
+      expect(body.motion.isRetrograde).toEqual(false)
+      expect(body.motion.oneSecondMotionAmount).toEqual(1.9936038597734296e-8)
+      expect(body.motion.withinPreRetrogradeShadow).toEqual(true)
+      expect(body.motion.withinPostRetrogradeShadow).toEqual(false)
+
+      expect(body.motion.nextRetrogradeDate).toEqual(new Date("2019-08-12T02:27:46.000Z"))
+      expect(body.motion.prevRetrogradeDate).toEqual(undefined)
+      expect(body.motion.nextDirectDate).toEqual(new Date("2020-01-11T01:50:01.000Z"))
+      expect(body.motion.prevDirectDate).toEqual(undefined)
+    })
+
+    it ('calculates motion in-retrograde', () => {
+      ephemeris = new Ephemeris({...defaultOrigin, year: 2019, month: 7, day: 13, key: 'uranus', calculateShadows: true})
+      body = ephemeris.uranus
+
+      expect(body.motion.isRetrograde).toEqual(true)
+      expect(body.motion.oneSecondMotionAmount).toEqual(-8.560334663343383e-9)
+      expect(body.motion.withinPreRetrogradeShadow).toEqual(false)
+      expect(body.motion.withinPostRetrogradeShadow).toEqual(false)
+
+      expect(body.motion.nextRetrogradeDate).toEqual(undefined)
+      expect(body.motion.prevRetrogradeDate).toEqual(undefined)
+      expect(body.motion.nextDirectDate).toEqual(undefined)
+      expect(body.motion.prevDirectDate).toEqual(undefined)
+    })
+
+    it ('calculates motion post-retrograde', () => {
+      ephemeris = new Ephemeris({...defaultOrigin, year: 2020, month: 0, day: 12, key: 'uranus', calculateShadows: true})
+      body = ephemeris.uranus
+
+      expect(body.motion.isRetrograde).toEqual(false)
+      expect(body.motion.oneSecondMotionAmount).toEqual(9.172225645670551e-9)
+      expect(body.motion.withinPreRetrogradeShadow).toEqual(false)
+      expect(body.motion.withinPostRetrogradeShadow).toEqual(true)
+
+      expect(body.motion.nextRetrogradeDate).toEqual(new Date("2020-08-15T14:27:21.000Z"))
+      expect(body.motion.prevRetrogradeDate).toEqual(new Date("2019-08-12T02:27:46.000Z"))
+      expect(body.motion.nextDirectDate).toEqual(new Date("2021-01-14T08:37:11.000Z"))
+      expect(body.motion.prevDirectDate).toEqual(new Date("2020-01-11T01:50:01.000Z"))
+    })
   })
 
   describe('Neptune', () => {
@@ -976,6 +1021,51 @@ describe('Ephemeris', () => {
     	expect(body.position.trueGeocentricDistance).toEqual(31.021122375248595);
 
       expect(body.position.constellation).toEqual("Cap Capricorni");
+    })
+
+    it ('calculates motion pre-retrograde', () => {
+      ephemeris = new Ephemeris({...defaultOrigin, year: 2019, month: 5, day: 20, key: 'neptune', calculateShadows: true})
+      body = ephemeris.neptune
+
+      expect(body.motion.isRetrograde).toEqual(false)
+      expect(body.motion.oneSecondMotionAmount).toEqual(1.0261544503009645e-8)
+      expect(body.motion.withinPreRetrogradeShadow).toEqual(true)
+      expect(body.motion.withinPostRetrogradeShadow).toEqual(false)
+
+      expect(body.motion.nextRetrogradeDate).toEqual(new Date("2019-06-21T14:36:51.000Z"))
+      expect(body.motion.prevRetrogradeDate).toEqual(undefined)
+      expect(body.motion.nextDirectDate).toEqual(new Date("2019-11-27T12:33:45.000Z"))
+      expect(body.motion.prevDirectDate).toEqual(undefined)
+    })
+
+    it ('calculates motion in-retrograde', () => {
+      ephemeris = new Ephemeris({...defaultOrigin, year: 2019, month: 5, day: 22, key: 'neptune', calculateShadows: true})
+      body = ephemeris.neptune
+
+      expect(body.motion.isRetrograde).toEqual(true)
+      expect(body.motion.oneSecondMotionAmount).toEqual(-2.494516593287699e-9)
+      expect(body.motion.withinPreRetrogradeShadow).toEqual(false)
+      expect(body.motion.withinPostRetrogradeShadow).toEqual(false)
+
+      expect(body.motion.nextRetrogradeDate).toEqual(undefined)
+      expect(body.motion.prevRetrogradeDate).toEqual(undefined)
+      expect(body.motion.nextDirectDate).toEqual(undefined)
+      expect(body.motion.prevDirectDate).toEqual(undefined)
+    })
+
+    it ('calculates motion post-retrograde', () => {
+      ephemeris = new Ephemeris({...defaultOrigin, year: 2019, month: 11, day: 1, key: 'neptune', calculateShadows: true})
+      body = ephemeris.neptune
+
+      expect(body.motion.isRetrograde).toEqual(false)
+      expect(body.motion.oneSecondMotionAmount).toEqual(2.3179779873316875e-8)
+      expect(body.motion.withinPreRetrogradeShadow).toEqual(false)
+      expect(body.motion.withinPostRetrogradeShadow).toEqual(true)
+
+      expect(body.motion.nextRetrogradeDate).toEqual(new Date("2020-06-23T04:33:01.000Z"))
+      expect(body.motion.prevRetrogradeDate).toEqual(new Date("2019-06-21T14:36:51.000Z"))
+      expect(body.motion.nextDirectDate).toEqual(new Date("2020-11-29T00:37:36.000Z"))
+      expect(body.motion.prevDirectDate).toEqual(new Date("2019-11-27T12:33:45.000Z"))
     })
   })
 
@@ -1037,6 +1127,51 @@ describe('Ephemeris', () => {
 
       expect(body.position.constellation).toEqual("Oph Ophiuchi");
     })
+
+    it ('calculates motion pre-retrograde', () => {
+      ephemeris = new Ephemeris({...defaultOrigin, year: 2019, month: 3, day: 23, key: 'pluto', calculateShadows: true})
+      body = ephemeris.pluto
+
+      expect(body.motion.isRetrograde).toEqual(false)
+      expect(body.motion.oneSecondMotionAmount).toEqual(1.0098972325067734e-8)
+      expect(body.motion.withinPreRetrogradeShadow).toEqual(true)
+      expect(body.motion.withinPostRetrogradeShadow).toEqual(false)
+
+      expect(body.motion.nextRetrogradeDate).toEqual(new Date("2019-04-24T18:48:31.000Z"))
+      expect(body.motion.prevRetrogradeDate).toEqual(undefined)
+      expect(body.motion.nextDirectDate).toEqual(new Date("2019-10-03T06:40:26.000Z"))
+      expect(body.motion.prevDirectDate).toEqual(undefined)
+    })
+
+    it ('calculates motion in-retrograde', () => {
+      ephemeris = new Ephemeris({...defaultOrigin, year: 2019, month: 3, day: 25, key: 'pluto', calculateShadows: true})
+      body = ephemeris.pluto
+
+      expect(body.motion.isRetrograde).toEqual(true)
+      expect(body.motion.oneSecondMotionAmount).toEqual(-1.236116986547131e-9)
+      expect(body.motion.withinPreRetrogradeShadow).toEqual(false)
+      expect(body.motion.withinPostRetrogradeShadow).toEqual(false)
+
+      expect(body.motion.nextRetrogradeDate).toEqual(undefined)
+      expect(body.motion.prevRetrogradeDate).toEqual(undefined)
+      expect(body.motion.nextDirectDate).toEqual(undefined)
+      expect(body.motion.prevDirectDate).toEqual(undefined)
+    })
+
+    it ('calculates motion post-retrograde', () => {
+      ephemeris = new Ephemeris({...defaultOrigin, year: 2019, month: 9, day: 4, key: 'pluto', calculateShadows: true})
+      body = ephemeris.pluto
+
+      expect(body.motion.isRetrograde).toEqual(false)
+      expect(body.motion.oneSecondMotionAmount).toEqual(4.188393631920917e-9)
+      expect(body.motion.withinPreRetrogradeShadow).toEqual(false)
+      expect(body.motion.withinPostRetrogradeShadow).toEqual(true)
+
+      expect(body.motion.nextRetrogradeDate).toEqual(new Date("2020-04-25T18:54:51.000Z"))
+      expect(body.motion.prevRetrogradeDate).toEqual(new Date("2019-04-24T18:48:31.000Z"))
+      expect(body.motion.nextDirectDate).toEqual(new Date("2020-10-04T13:33:10.000Z"))
+      expect(body.motion.prevDirectDate).toEqual(new Date("2019-10-03T06:40:26.000Z"))
+    })
   })
 
   describe('Chiron', () => {
@@ -1096,6 +1231,51 @@ describe('Ephemeris', () => {
     	expect(body.position.trueGeocentricDistance).toEqual(10.717603798330382);
 
       expect(body.position.constellation).toEqual("Oph Ophiuchi");
+    })
+
+    it ('calculates motion pre-retrograde', () => {
+      ephemeris = new Ephemeris({...defaultOrigin, year: 2019, month: 6, day: 7, key: 'chiron', calculateShadows: true})
+      body = ephemeris.chiron
+
+      expect(body.motion.isRetrograde).toEqual(false)
+      expect(body.motion.oneSecondMotionAmount).toEqual(2.1428746777019114e-8)
+      expect(body.motion.withinPreRetrogradeShadow).toEqual(true)
+      expect(body.motion.withinPostRetrogradeShadow).toEqual(false)
+
+      expect(body.motion.nextRetrogradeDate).toEqual(new Date("2019-07-09T02:46:51.000Z"))
+      expect(body.motion.prevRetrogradeDate).toEqual(undefined)
+      expect(body.motion.nextDirectDate).toEqual(new Date("2019-12-13T06:26:36.000Z"))
+      expect(body.motion.prevDirectDate).toEqual(undefined)
+    })
+
+    it ('calculates motion in-retrograde', () => {
+      ephemeris = new Ephemeris({...defaultOrigin, year: 2019, month: 6, day: 10, key: 'chiron', calculateShadows: true})
+      body = ephemeris.chiron
+
+      expect(body.motion.isRetrograde).toEqual(true)
+      expect(body.motion.oneSecondMotionAmount).toEqual(-8.81479422787379e-9)
+      expect(body.motion.withinPreRetrogradeShadow).toEqual(false)
+      expect(body.motion.withinPostRetrogradeShadow).toEqual(false)
+
+      expect(body.motion.nextRetrogradeDate).toEqual(undefined)
+      expect(body.motion.prevRetrogradeDate).toEqual(undefined)
+      expect(body.motion.nextDirectDate).toEqual(undefined)
+      expect(body.motion.prevDirectDate).toEqual(undefined)
+    })
+
+    it ('calculates motion post-retrograde', () => {
+      ephemeris = new Ephemeris({...defaultOrigin, year: 2019, month: 11, day: 14, key: 'chiron', calculateShadows: true})
+      body = ephemeris.chiron
+
+      expect(body.motion.isRetrograde).toEqual(false)
+      expect(body.motion.oneSecondMotionAmount).toEqual(7.779476618452463e-9)
+      expect(body.motion.withinPreRetrogradeShadow).toEqual(false)
+      expect(body.motion.withinPostRetrogradeShadow).toEqual(true)
+
+      expect(body.motion.nextRetrogradeDate).toEqual(new Date("2020-07-12T00:03:11.000Z"))
+      expect(body.motion.prevRetrogradeDate).toEqual(new Date("2019-07-09T02:46:51.000Z"))
+      expect(body.motion.nextDirectDate).toEqual(new Date("2020-12-16T01:13:16.000Z"))
+      expect(body.motion.prevDirectDate).toEqual(new Date("2019-12-13T06:26:36.000Z"))
     })
   })
 
