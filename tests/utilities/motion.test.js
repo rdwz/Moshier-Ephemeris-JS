@@ -32,6 +32,11 @@ describe('getDirectedDate', () => {
       const newDate = getDirectedDate({direction: 'next', unit: 'second', utcDate})
       expect(newDate).toEqual(new Date("2019-10-31T00:00:01.000Z")) // 10/31/2019 00:00:01 UTC
     })
+
+    it('finds the next 3 days', () => {
+      const newDate = getDirectedDate({amount: 3, direction: 'next', unit: 'date', utcDate})
+      expect(newDate).toEqual(new Date("2019-11-03T00:00:00.000Z")) // 11/1/2019 midnight UTC
+    })
   })
 
   describe('prev', () => {
@@ -43,6 +48,11 @@ describe('getDirectedDate', () => {
     it('finds the prev minute', () => {
       const newDate = getDirectedDate({direction: 'prev', unit: 'minute', utcDate})
       expect(newDate).toEqual(new Date("2019-10-30T23:59:00.000Z")) // 10/30/2019 23:59 UTC
+    })
+
+    it('finds the prev 3 days', () => {
+      const newDate = getDirectedDate({amount: 3, direction: 'prev', unit: 'date', utcDate})
+      expect(newDate).toEqual(new Date("2019-10-28T00:00:00.000Z")) // 11/1/2019 midnight UTC
     })
   })
 })
@@ -110,9 +120,9 @@ describe('calculateNextDirectStation', () => {
         const utcDate = new Date(Date.UTC(2019, 9, 31, 0, 0)) // direct 10/31/2019 midnight UTC
         const station = calculateNextDirectStation({direction: 'next', bodyKey: 'mercury', utcDate})
 
-        expect(station.date).toEqual(new Date("2019-11-20T19:12:37.000Z")) // 10/31/2019 15:42:26 UTC
-        expect(station.apparentLongitude).toEqual(221.58646545567194)
-        expect(station.nextMovementAmount).toEqual(2.8421709430404007e-11)
+        expect(station.date).toEqual(new Date("2019-11-20T19:12:56.000Z")) // 10/31/2019 19:12:56 UTC
+        expect(station.apparentLongitude).toEqual(221.58646545441988)
+        expect(station.nextMovementAmount).toEqual(4.974367584509309e-10)
       })
     })
 
@@ -135,9 +145,9 @@ describe('calculateNextDirectStation', () => {
         const utcDate = new Date(Date.UTC(2019, 9, 31, 20, 0)) // retrograde 10/31/2019 20:00 UTC
         const station = calculateNextDirectStation({bodyKey: 'mercury', utcDate})
 
-        expect(station.date).toEqual(new Date("2019-11-20T19:12:37.000Z")) // 11/20/2019 19:12:36 UTC
-        expect(station.apparentLongitude).toEqual(221.58646545567194)
-        expect(station.nextMovementAmount).toEqual(2.8421709430404007e-11)
+        expect(station.date).toEqual(new Date("2019-11-20T19:12:56.000Z")) // 11/20/2019 19:12:56 UTC
+        expect(station.apparentLongitude).toEqual(221.58646545441988)
+        expect(station.nextMovementAmount).toEqual(4.974367584509309e-10)
 
       })
     })
@@ -223,10 +233,10 @@ describe('calculateNextDirectMoment', () => {
 
         const moment = calculateNextDirectMoment({bodyKey: 'mercury', utcDate, direction: 'next'})
 
-        expect(moment.date).toEqual(new Date("2019-11-20T19:12:37.000Z")) // 11/20/2019 19:12:37 UTC
+        expect(moment.date).toEqual(new Date("2019-11-20T19:12:56.000Z")) // 11/20/2019 19:12:56 UTC
 
-        expect(moment.apparentLongitude).toEqual(221.58646545567194)
-        expect(moment.nextMovementAmount).toEqual(2.8421709430404007e-11)
+        expect(moment.apparentLongitude).toEqual(221.58646545441988)
+        expect(moment.nextMovementAmount).toEqual(4.974367584509309e-10)
       })
     })
 

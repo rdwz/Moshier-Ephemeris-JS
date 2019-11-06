@@ -73,7 +73,7 @@ export default class Luna {
 
   static GetQuarterApproximationDirectionString({phaseDaysBefore=0.00, phaseDaysPast=0.00, halfRangeLength=1.5}={}) {
     if (!!phaseDaysBefore && phaseDaysBefore <= halfRangeLength) return "Entering"
-    if (!!phaseDaysPast && phaseDaysPast <= halfRangeLength) return "Leaving"    
+    if (!!phaseDaysPast && phaseDaysPast <= halfRangeLength) return "Leaving"
   }
 
   calculateBody(body, earthBody, observer) {

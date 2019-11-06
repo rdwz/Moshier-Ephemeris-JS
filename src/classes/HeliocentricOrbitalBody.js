@@ -59,30 +59,34 @@ export default class HeliocentricOrbitalBody {
 
     this.motion.isRetrograde = !!(this.motion.oneSecondMotionAmount <= 0)
 
-    if (calculateShadows) {
+    if (calculateShadows && !this.motion.isRetrograde) {
       const nextRetrograde = calculateNextRetrogradeStation({direction: "next", utcDate: observer.Date.utc, bodyKey: body.key, currentApparentLongitude: this.position.apparentLongitude})
 
       this.motion.nextRetrogradeDate = nextRetrograde.date
       this.motion.nextRetrogradeApparentLongitude = nextRetrograde.apparentLongitude
-
-      const prevRetrograde = calculateNextRetrogradeStation({direction: "prev", utcDate: observer.Date.utc, bodyKey: body.key, currentApparentLongitude: this.position.apparentLongitude})
-
-      this.motion.prevRetrogradeDate = prevRetrograde.date
-      this.motion.prevRetrogradeApparentLongitude = prevRetrograde.apparentLongitude
 
       const nextDirect = calculateNextDirectStation({direction: "next", utcDate: observer.Date.utc, bodyKey: body.key, currentApparentLongitude: this.position.apparentLongitude})
 
       this.motion.nextDirectDate = nextDirect.date
       this.motion.nextDirectApparentLongitude = nextDirect.apparentLongitude
 
-      const prevDirect = calculateNextDirectStation({direction: "prev", utcDate: observer.Date.utc, bodyKey: body.key, currentApparentLongitude: this.position.apparentLongitude})
+      this.motion.withinPreRetrogradeShadow =  this.position.apparentLongitude >= this.motion.nextDirectApparentLongitude && this.position.apparentLongitude <= this.motion.nextRetrogradeApparentLongitude
 
-      this.motion.prevDirectDate = prevDirect.date
-      this.motion.prevDirectApparentLongitude = prevDirect.apparentLongitude
+      if (!this.motion.withinPreRetrogradeShadow) {
+        // Only check if in postRetrogradeShadow when you're not in the preRetrogradeShadow
+        const prevRetrograde = calculateNextRetrogradeStation({direction: "prev", utcDate: observer.Date.utc, bodyKey: body.key, currentApparentLongitude: this.position.apparentLongitude})
 
-      this.motion.withinPreRetrogradeShadow = !this.motion.isRetrograde && this.position.apparentLongitude >= this.motion.nextDirectApparentLongitude && this.position.apparentLongitude <= this.motion.nextRetrogradeApparentLongitude
+        this.motion.prevRetrogradeDate = prevRetrograde.date
+        this.motion.prevRetrogradeApparentLongitude = prevRetrograde.apparentLongitude
 
-      this.motion.withinPostRetrogradeShadow = !this.motion.isRetrograde && this.position.apparentLongitude >= this.motion.prevDirectApparentLongitude && this.position.apparentLongitude <= this.motion.prevRetrogradeApparentLongitude
+        const prevDirect = calculateNextDirectStation({direction: "prev", utcDate: observer.Date.utc, bodyKey: body.key, currentApparentLongitude: this.position.apparentLongitude})
+
+        this.motion.prevDirectDate = prevDirect.date
+        this.motion.prevDirectApparentLongitude = prevDirect.apparentLongitude
+
+
+        this.motion.withinPostRetrogradeShadow = this.position.apparentLongitude >= this.motion.prevDirectApparentLongitude && this.position.apparentLongitude <= this.motion.prevRetrogradeApparentLongitude
+      }
     }
   }
 

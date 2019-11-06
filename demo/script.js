@@ -28,7 +28,7 @@ class Demo {
       longitude: parseFloat(this.longitudeInput.value)
     }
 
-  const ephemeris = new Ephemeris.default(origin)
+  const ephemeris = new Ephemeris.default({...origin, calculateShadows: true})
   console.log(`EPHEMERIS: `, ephemeris)
   console.log(`EPHEMERIS RESULTS FOR ${this.dateInput.value} -- ${this.timeInput.value} UTC}`, ephemeris.Results)
 

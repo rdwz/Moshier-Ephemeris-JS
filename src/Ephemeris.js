@@ -17,8 +17,8 @@ export default class Ephemeris {
     key=undefined,
     moonQuarterApproximationValue=1.5,
     calculateMotion=true,
-    apparentLongitudeOnly=false,
-    calculateShadows=false
+    calculateShadows=false,
+    apparentLongitudeOnly=false
   }={}) {
     // Assumes UTC time
     // * int year (> 0 C.E.)
@@ -63,12 +63,15 @@ export default class Ephemeris {
     const body = new Body(bodyKey)
     switch(body.type) {
       case 'sun':
-        return new Sol(body, this.Earth, this.Observer)
+        if (this._apparentLongitudeOnly) return {}
+        return new Sol(body, this.Earth, this.Observer, this._apparentLongitudeOnly)
       case 'luna':
+        if (this._apparentLongitudeOnly) return {}
         return new Luna({body: body, earthBody: this.Earth, observer: this.Observer, quarterApproximationValue: this._moonQuarterApproximationValue})
       case 'heliocentric':
         return new HeliocentricOrbitalBody(body, this.Earth, this.Observer, this._calculateMotion, this._apparentLongitudeOnly, this._calculateShadows)
       case 'star':
+        if (this._apparentLongitudeOnly) return {}
         return new Star(body, this.Earth, this.Observer)
       default:
         throw new Error(`Celestial body with key: "${bodyKey}" or type "${body.type}" not found.`)
