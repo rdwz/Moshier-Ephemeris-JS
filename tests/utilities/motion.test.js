@@ -4,32 +4,32 @@ describe('getDirectedDate', () => {
   const utcDate = new Date(Date.UTC(2019, 9, 31, 0, 0)) // 10/31/2019 midnight UTC
   describe('errors', () => {
     it('throws invalid direction error', () => {
-      expect(() => getDirectedDate({direction: 'bad direction', unit: 'date', utcDate})).toThrowError("Please pass in direction from the following: 'next' or 'prev'. Not \"bad direction\".")
+      expect(() => getDirectedDate({amount:1, direction: 'bad direction', unit: 'date', utcDate})).toThrowError("Please pass in direction from the following: 'next' or 'prev'. Not \"bad direction\".")
     })
 
     it('throws invalid unit error', () => {
-      expect(() => getDirectedDate({direction: 'next', unit: 'bad unit', utcDate})).toThrowError("Please pass in unit from the following: 'date', 'hour', 'minute', or 'second'. Not \"bad unit\".")
+      expect(() => getDirectedDate({amount:1, direction: 'next', unit: 'bad unit', utcDate})).toThrowError("Please pass in unit from the following: 'date', 'hour', 'minute', or 'second'. Not \"bad unit\".")
     })
   })
 
   describe('next', () => {
     it('finds the next date', () => {
-      const newDate = getDirectedDate({direction: 'next', unit: 'date', utcDate})
+      const newDate = getDirectedDate({amount: 1, direction: 'next', unit: 'date', utcDate})
       expect(newDate).toEqual(new Date("2019-11-01T00:00:00.000Z")) // 11/1/2019 midnight UTC
     })
 
     it('finds the next hour', () => {
-      const newDate = getDirectedDate({direction: 'next', unit: 'hour', utcDate})
+      const newDate = getDirectedDate({amount: 1, direction: 'next', unit: 'hour', utcDate})
       expect(newDate).toEqual(new Date("2019-10-31T01:00:00.000Z")) // 10/31/2019 00:01:00 UTC
     })
 
     it('finds the next minute', () => {
-      const newDate = getDirectedDate({direction: 'next', unit: 'minute', utcDate})
+      const newDate = getDirectedDate({amount: 1, direction: 'next', unit: 'minute', utcDate})
       expect(newDate).toEqual(new Date("2019-10-31T00:01:00.000Z")) // 10/31/2019 00:01:00 UTC
     })
 
     it('finds the next second', () => {
-      const newDate = getDirectedDate({direction: 'next', unit: 'second', utcDate})
+      const newDate = getDirectedDate({amount: 1, direction: 'next', unit: 'second', utcDate})
       expect(newDate).toEqual(new Date("2019-10-31T00:00:01.000Z")) // 10/31/2019 00:00:01 UTC
     })
 
@@ -41,12 +41,12 @@ describe('getDirectedDate', () => {
 
   describe('prev', () => {
     it('finds the prev date', () => {
-      const newDate = getDirectedDate({direction: 'prev', unit: 'date', utcDate})
+      const newDate = getDirectedDate({amount: 1, direction: 'prev', unit: 'date', utcDate})
       expect(newDate).toEqual(new Date("2019-10-30T00:00:00.000Z")) // 10/30/2019 midnight UTC
     })
 
     it('finds the prev minute', () => {
-      const newDate = getDirectedDate({direction: 'prev', unit: 'minute', utcDate})
+      const newDate = getDirectedDate({amount: 1, direction: 'prev', unit: 'minute', utcDate})
       expect(newDate).toEqual(new Date("2019-10-30T23:59:00.000Z")) // 10/30/2019 23:59 UTC
     })
 

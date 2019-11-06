@@ -37,10 +37,11 @@ export const motionEventObject = ({utcDate, apparentLongitude, nextMovementAmoun
   })
 }
 
-export const getDirectedDate = ({direction = 'next', unit = 'date', amount=1, utcDate}={}) => {
+export const getDirectedDate = ({direction = 'next', unit = 'date', amount=0, utcDate}={}) => {
   // Given a date object, returns next [date or minute] or prev [date or minute] in new date object
   if (!['next', 'prev'].includes(direction)) throw new Error(`Please pass in direction from the following: 'next' or 'prev'. Not "${direction}".`)
   if (!['date', 'hour', 'minute', 'second'].includes(unit)) throw new Error(`Please pass in unit from the following: 'date', 'hour', 'minute', or 'second'. Not "${unit}".`)
+  if (!amount) throw new Error('Please enter an amount')
 
   const newDate = util.cloneUTCDate(utcDate)
   const directionIncrement = direction === 'next' ? amount : -1 * amount
@@ -141,7 +142,7 @@ export const calculateNextRetrogradeStation = ({direction='next', bodyKey, utcDa
 
   let currentDate = util.cloneUTCDate(utcDate)
 
-  if (!currentMovementAmount) {
+  if (currentMovementAmount !== 0 && !currentMovementAmount) {
     currentMovementAmount = getCurrentMovementAmount(bodyKey, utcDate, currentApparentLongitude)
   }
 
@@ -149,13 +150,13 @@ export const calculateNextRetrogradeStation = ({direction='next', bodyKey, utcDa
     if (direction === 'next') {
       // Skip to end of current retrograde
       // and find the next retrograde moment from there
-      const nextDirectMoment = calculateNextDirectMoment({direction: 'next', bodyKey, utcDate: currentDate, currentApparentLongitude})
+      const nextDirectMoment = calculateNextDirectMoment({direction: 'next', bodyKey, utcDate: currentDate, currentApparentLongitude, currentMovementAmount})
 
-      return calculateNextRetrogradeMoment({direction: 'next', bodyKey, utcDate: nextDirectMoment.date, currentApparentLongitude: nextDirectMoment.apparentLongitude})
+      return calculateNextRetrogradeMoment({direction: 'next', bodyKey, utcDate: nextDirectMoment.date, currentApparentLongitude: nextDirectMoment.apparentLongitude, currentMovementAmount: nextDirectMoment.nextMovementAmount})
 
     } else if (direction === 'prev') {
       // Skip backwards through entire retrograde to find next direct moment
-      const prevDirectMoment = calculateNextDirectMoment({direction: 'prev', bodyKey, utcDate: currentDate, currentApparentLongitude})
+      const prevDirectMoment = calculateNextDirectMoment({direction: 'prev', bodyKey, utcDate: currentDate, currentApparentLongitude, currentMovementAmount})
 
       // add 1 second
       const nextDate = getDirectedDate({direction:'next', amount: 1, unit: 'second', utcDate: prevDirectMoment.date});
@@ -167,13 +168,13 @@ export const calculateNextRetrogradeStation = ({direction='next', bodyKey, utcDa
   } else {
     if (direction === 'next') {
       // If we're direct, just find the next retrograde moment
-      return calculateNextRetrogradeMoment({direction: 'next', bodyKey, utcDate, currentApparentLongitude})
+      return calculateNextRetrogradeMoment({direction: 'next', bodyKey, utcDate, currentApparentLongitude, currentMovementAmount})
     } else if (direction === 'prev') {
       // Find prev retrograde moment
-      const prevRetroMoment = calculateNextRetrogradeMoment({direction: 'prev', bodyKey, utcDate: currentDate, currentApparentLongitude})
+      const prevRetroMoment = calculateNextRetrogradeMoment({direction: 'prev', bodyKey, utcDate: currentDate, currentApparentLongitude, currentMovementAmount})
 
       // Skip backwards through entire retrograde cycle to find next direct moment
-      const prevDirectMoment = calculateNextDirectMoment({direction: 'prev', bodyKey, utcDate: prevRetroMoment.date, currentApparentLongitude: prevRetroMoment.apparentLongitude})
+      const prevDirectMoment = calculateNextDirectMoment({direction: 'prev', bodyKey, utcDate: prevRetroMoment.date, currentApparentLongitude: prevRetroMoment.apparentLongitude, currentMovementAmount: prevRetroMoment.nextMovementAmount})
 
       // add 1 second
       const nextDate = getDirectedDate({direction:'next', amount: 1, unit: 'second', utcDate: prevDirectMoment.date});
@@ -195,7 +196,7 @@ export const calculateNextDirectStation = ({direction='next', bodyKey, utcDate, 
 
   let currentDate = util.cloneUTCDate(utcDate)
 
-  if (!currentMovementAmount) {
+  if (currentMovementAmount !== 0 && !currentMovementAmount) {
     currentMovementAmount = getCurrentMovementAmount(bodyKey, utcDate, currentApparentLongitude)
   }
 
@@ -203,13 +204,13 @@ export const calculateNextDirectStation = ({direction='next', bodyKey, utcDate, 
     if (direction === 'next') {
       // Skip to end of current direct phase
       // and find the next direct moment from there
-      const nextRetrogradeMoment = calculateNextRetrogradeMoment({direction: 'next', bodyKey, utcDate: currentDate, currentApparentLongitude})
+      const nextRetrogradeMoment = calculateNextRetrogradeMoment({direction: 'next', bodyKey, utcDate: currentDate, currentApparentLongitude, currentMovementAmount})
 
-      return calculateNextDirectMoment({direction: 'next', bodyKey, utcDate: nextRetrogradeMoment.date, currentApparentLongitude: nextRetrogradeMoment.apparentLongitude})
+      return calculateNextDirectMoment({direction: 'next', bodyKey, utcDate: nextRetrogradeMoment.date, currentApparentLongitude: nextRetrogradeMoment.apparentLongitude, currentMovementAmount: nextRetrogradeMoment.nextMovementAmount})
 
     } else if (direction === 'prev') {
       // Skip backwards through entire direct
-      const prevDirectMoment = calculateNextRetrogradeMoment({direction: 'prev', bodyKey, utcDate: currentDate, currentApparentLongitude})
+      const prevDirectMoment = calculateNextRetrogradeMoment({direction: 'prev', bodyKey, utcDate: currentDate, currentApparentLongitude, currentMovementAmount})
 
       // add 1 second
       const nextDate = getDirectedDate({direction:'next', amount: 1, unit: 'second', utcDate: prevDirectMoment.date});
@@ -220,13 +221,13 @@ export const calculateNextDirectStation = ({direction='next', bodyKey, utcDate, 
     }
   } else {
     if (direction === 'next') {
-      return calculateNextDirectMoment({direction: 'next', bodyKey, utcDate, currentApparentLongitude})
+      return calculateNextDirectMoment({direction: 'next', bodyKey, utcDate, currentApparentLongitude, currentMovementAmount})
     } else if (direction === 'prev') {
       // Find prev direct moment
-      const prevRetroMoment = calculateNextDirectMoment({direction: 'prev', bodyKey, utcDate: currentDate, currentApparentLongitude})
+      const prevRetroMoment = calculateNextDirectMoment({direction: 'prev', bodyKey, utcDate: currentDate, currentApparentLongitude, currentMovementAmount})
 
       // Skip backwards through entire direct to find next retrograde moment
-      const prevDirectMoment = calculateNextRetrogradeMoment({direction: 'prev', bodyKey, utcDate: prevRetroMoment.date, currentApparentLongitude: prevRetroMoment.apparentLongitude})
+      const prevDirectMoment = calculateNextRetrogradeMoment({direction: 'prev', bodyKey, utcDate: prevRetroMoment.date, currentApparentLongitude: prevRetroMoment.apparentLongitude, currentMovementAmount: prevRetroMoment.nextMovementAmount})
 
       // add 1 second
       const nextDate = getDirectedDate({direction:'next', amount: 1, unit: 'second', utcDate: prevDirectMoment.date});
@@ -238,7 +239,7 @@ export const calculateNextDirectStation = ({direction='next', bodyKey, utcDate, 
   }
 }
 
-export const calculateNextRetrogradeMoment = ({bodyKey, utcDate, currentApparentLongitude=null, direction='next'}={}) => {
+export const calculateNextRetrogradeMoment = ({bodyKey, utcDate, currentApparentLongitude=null, direction='next', currentMovementAmount=null}={}) => {
   if (!['next', 'prev'].includes(direction)) throw new Error(`Please pass in direction from the following: 'next' or 'prev'. Not "${direction}".`)
 
   if (!currentApparentLongitude) {
@@ -247,7 +248,9 @@ export const calculateNextRetrogradeMoment = ({bodyKey, utcDate, currentApparent
 
   let currentDate = util.cloneUTCDate(utcDate)
 
-  let currentMovementAmount = getCurrentMovementAmount(bodyKey, utcDate, currentApparentLongitude)
+  if (currentMovementAmount !== 0 && !currentMovementAmount) {
+    currentMovementAmount = getCurrentMovementAmount(bodyKey, utcDate, currentApparentLongitude)
+  }
 
   if (isRetrograde(currentMovementAmount)) return motionEventObject({utcDate: currentDate, apparentLongitude: currentApparentLongitude, nextMovementAmount: currentMovementAmount, interval: 'second'})
 
@@ -391,7 +394,7 @@ export const calculateNextRetrogradeMoment = ({bodyKey, utcDate, currentApparent
 }
 
 
-export const calculateNextDirectMoment = ({bodyKey, utcDate, currentApparentLongitude=null, direction='next'}={}) => {
+export const calculateNextDirectMoment = ({bodyKey, utcDate, currentApparentLongitude=null, direction='next', currentMovementAmount=null}={}) => {
   if (!['next', 'prev'].includes(direction)) throw new Error(`Please pass in direction from the following: 'next' or 'prev'. Not "${direction}".`)
 
   if (!currentApparentLongitude) {
@@ -400,7 +403,9 @@ export const calculateNextDirectMoment = ({bodyKey, utcDate, currentApparentLong
 
   let currentDate = util.cloneUTCDate(utcDate)
 
-  let currentMovementAmount = getCurrentMovementAmount(bodyKey, utcDate, currentApparentLongitude)
+  if (currentMovementAmount !== 0 && !currentMovementAmount) {
+    currentMovementAmount = getCurrentMovementAmount(bodyKey, utcDate, currentApparentLongitude)
+  }
 
   if (isDirect(currentMovementAmount)) return motionEventObject({utcDate, apparentLongitude: currentApparentLongitude, nextMovementAmount: currentMovementAmount, interval: 'second'})
 
@@ -439,7 +444,7 @@ export const calculateNextDirectMoment = ({bodyKey, utcDate, currentApparentLong
   }
 
   // NOTE - standardizes the approach to always approach from the past.
-  // This is because I've found that calculating the next event can produce varied results when calculating from either the or the past.
+  // This is because I've found that calculating the next event can produce varied results when calculating from either the future or the past.
   // For example, approaching a retrograde event from the past will find the event at 0:01, and approaching from the future another will find it at 0:50.
   // This seems to be more of an inconsistency or unexpected anomoly in the apparentLongitude calcs than anything else.
   fixedDate = util.cloneUTCDate(lastDate)
