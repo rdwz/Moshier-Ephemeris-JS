@@ -170,9 +170,16 @@ export const calculateNextRetrogradeMoment = ({bodyKey, utcDate, currentApparent
 
   let intervalUnit
   let fixedDate
+  let lastDate = currentDate
+  let lastAppLong = currentApparentLongitude
+  let lastMovementAmount = currentMovementAmount
   while(isDirect(currentMovementAmount)) {
     const tuningDirection = direction
     intervalUnit = 'date'
+
+    lastDate = util.cloneUTCDate(currentDate)
+    lastAppLong = currentApparentLongitude
+    lastMovementAmount = currentMovementAmount
 
     // reset date hours
     currentDate = util.cloneUTCDate(currentDate)
@@ -190,7 +197,7 @@ export const calculateNextRetrogradeMoment = ({bodyKey, utcDate, currentApparent
   // This is because I've found that calculating the next event can produce varied results when calculating from either the or the past.
   // For example, approaching a retrograde event from the past will find the event at 0:01, and approaching from the future another will find it at 0:50.
   // This seems to be more of an inconsistency or unexpected anomoly in the apparentLongitude calcs than anything else.
-  fixedDate = util.cloneUTCDate(currentDate)
+  fixedDate = util.cloneUTCDate(lastDate)
   fixedDate = getDirectedDate({direction: 'prev', unit: intervalUnit, utcDate: fixedDate})
   currentDate = fixedDate
   currentApparentLongitude = getApparentLongitude(bodyKey, currentDate)
@@ -200,6 +207,10 @@ export const calculateNextRetrogradeMoment = ({bodyKey, utcDate, currentApparent
     // Shifts by 1 hour until the first direct hour is found
     const tuningDirection = 'next'
     intervalUnit = 'hour'
+
+    lastDate = util.cloneUTCDate(currentDate)
+    lastAppLong = currentApparentLongitude
+    lastMovementAmount = currentMovementAmount
 
     // reset date minutes
     currentDate = util.cloneUTCDate(currentDate)
@@ -211,7 +222,7 @@ export const calculateNextRetrogradeMoment = ({bodyKey, utcDate, currentApparent
     currentMovementAmount = getCurrentMovementAmount(bodyKey, currentDate, currentApparentLongitude)
   }
 
-  fixedDate = util.cloneUTCDate(currentDate)
+  fixedDate = util.cloneUTCDate(lastDate)
   fixedDate = getDirectedDate({direction: 'prev', unit: intervalUnit, utcDate: fixedDate})
   currentDate = fixedDate
   currentApparentLongitude = getApparentLongitude(bodyKey, currentDate)
@@ -222,6 +233,10 @@ export const calculateNextRetrogradeMoment = ({bodyKey, utcDate, currentApparent
     const tuningDirection = 'next'
     intervalUnit = 'minute'
 
+    lastDate = util.cloneUTCDate(currentDate)
+    lastAppLong = currentApparentLongitude
+    lastMovementAmount = currentMovementAmount
+
     // reset date seconds
     currentDate = util.cloneUTCDate(currentDate)
     currentDate.setUTCSeconds(0)
@@ -231,15 +246,12 @@ export const calculateNextRetrogradeMoment = ({bodyKey, utcDate, currentApparent
     currentMovementAmount = getCurrentMovementAmount(bodyKey, currentDate, currentApparentLongitude)
   }
 
-  fixedDate = util.cloneUTCDate(currentDate)
+  fixedDate = util.cloneUTCDate(lastDate)
   fixedDate = getDirectedDate({direction: 'prev', unit: intervalUnit, utcDate: fixedDate})
   currentDate = fixedDate
   currentApparentLongitude = getApparentLongitude(bodyKey, currentDate)
   currentMovementAmount = getCurrentMovementAmount(bodyKey, currentDate, currentApparentLongitude)
 
-  let lastDate = currentDate
-  let lastAppLong = currentApparentLongitude
-  let lastMovementAmount = currentMovementAmount
   while(direction === 'next' ? isDirect(currentMovementAmount) : isRetrograde(lastMovementAmount)) {
     // Shifts by 1 second until the first retrograde second is found
     const tuningDirection = 'next'
@@ -277,9 +289,17 @@ export const calculateNextDirectMoment = ({bodyKey, utcDate, currentApparentLong
 
   let intervalUnit
   let fixedDate
+  let lastDate = currentDate
+  let lastAppLong = currentApparentLongitude
+  let lastMovementAmount = currentMovementAmount
+
   while(isRetrograde(currentMovementAmount)) {
     const tuningDirection = direction
     intervalUnit = 'date'
+
+    lastDate = util.cloneUTCDate(currentDate)
+    lastAppLong = currentApparentLongitude
+    lastMovementAmount = currentMovementAmount
 
     // reset date hours
     currentDate = util.cloneUTCDate(currentDate)
@@ -296,7 +316,7 @@ export const calculateNextDirectMoment = ({bodyKey, utcDate, currentApparentLong
   // This is because I've found that calculating the next event can produce varied results when calculating from either the or the past.
   // For example, approaching a retrograde event from the past will find the event at 0:01, and approaching from the future another will find it at 0:50.
   // This seems to be more of an inconsistency or unexpected anomoly in the apparentLongitude calcs than anything else.
-  fixedDate = util.cloneUTCDate(currentDate)
+  fixedDate = util.cloneUTCDate(lastDate)
   fixedDate = getDirectedDate({direction: 'prev', unit: intervalUnit, utcDate: fixedDate})
   currentDate = fixedDate
   currentApparentLongitude = getApparentLongitude(bodyKey, currentDate)
@@ -306,6 +326,10 @@ export const calculateNextDirectMoment = ({bodyKey, utcDate, currentApparentLong
     // Shifts by 1 hour until the first direct hour is found
     const tuningDirection = 'next'
     intervalUnit = 'hour'
+
+    lastDate = util.cloneUTCDate(currentDate)
+    lastAppLong = currentApparentLongitude
+    lastMovementAmount = currentMovementAmount
 
     // reset date minutes
     currentDate = util.cloneUTCDate(currentDate)
@@ -317,7 +341,7 @@ export const calculateNextDirectMoment = ({bodyKey, utcDate, currentApparentLong
     currentMovementAmount = getCurrentMovementAmount(bodyKey, currentDate, currentApparentLongitude)
   }
 
-  fixedDate = util.cloneUTCDate(currentDate)
+  fixedDate = util.cloneUTCDate(lastDate)
   fixedDate = getDirectedDate({direction: 'prev', unit: intervalUnit, utcDate: fixedDate})
   currentDate = fixedDate
   currentApparentLongitude = getApparentLongitude(bodyKey, currentDate)
@@ -328,6 +352,10 @@ export const calculateNextDirectMoment = ({bodyKey, utcDate, currentApparentLong
     const tuningDirection = 'next'
     intervalUnit = 'minute'
 
+    lastDate = util.cloneUTCDate(currentDate)
+    lastAppLong = currentApparentLongitude
+    lastMovementAmount = currentMovementAmount
+
     // reset date seconds
     currentDate = util.cloneUTCDate(currentDate)
     currentDate.setUTCSeconds(0)
@@ -337,16 +365,11 @@ export const calculateNextDirectMoment = ({bodyKey, utcDate, currentApparentLong
     currentMovementAmount = getCurrentMovementAmount(bodyKey, currentDate, currentApparentLongitude)
   }
 
-  fixedDate = util.cloneUTCDate(currentDate)
+  fixedDate = util.cloneUTCDate(lastDate)
   fixedDate = getDirectedDate({direction: 'prev', unit: intervalUnit, utcDate: fixedDate})
   currentDate = fixedDate
   currentApparentLongitude = getApparentLongitude(bodyKey, currentDate)
   currentMovementAmount = getCurrentMovementAmount(bodyKey, currentDate, currentApparentLongitude)
-
-
-  let lastDate = currentDate
-  let lastAppLong = currentApparentLongitude
-  let lastMovementAmount = currentMovementAmount
 
   while(direction === 'next' ? isRetrograde(currentMovementAmount) : isDirect(lastMovementAmount)) {
     // Shifts by 1 second until the first retrograde second is found

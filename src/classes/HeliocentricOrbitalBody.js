@@ -16,6 +16,13 @@ import Ephemeris from '../Ephemeris'
 
 export default class HeliocentricOrbitalBody {
   constructor(body, earthBody, observer, calculateMotion) {
+    /////////
+    // body = <object> - one of the bodies from celestialBodies.js
+    // earthBody = <object> - an instance of the Earth.js class
+    // observer <object> - an instance of the Observer.js class
+    // calculateMotion <bool> - whether this instance of the class should perform motion (retrograde / direct) calculations. Should only be true for initial calc, otherwise will stack overflow.
+    //////////
+
     this._earthBody = earthBody
     this._observer = observer
     this._calculateMotion = calculateMotion
@@ -47,7 +54,7 @@ export default class HeliocentricOrbitalBody {
   calculateMotion(body, observer) {
     this.motion = {}
 
-    this.motion.nextSecondApparentLongitudeDifference = getApparentLongitude(body.key, getDirectedDate({direction: "next", unit: "minute", utcDate: observer.Date.utc}), observer)
+    this.motion.nextSecondApparentLongitudeDifference = getApparentLongitude(body.key, getDirectedDate({direction: "next", unit: "second", utcDate: observer.Date.utc}), observer)
 
     this.motion.nextSecondApparentLongitudeDifference = getApparentLongitudeDifference(this.position.apparentLongitude, this.motion.nextSecondApparentLongitudeDifference)
 
