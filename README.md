@@ -128,7 +128,7 @@ ephemeris.Results
 // => Array[{sun}, {moon}, {mercury}...]
 ```
 
-##### Get the body position and retrograde motion
+##### Get the Body Position and Retrograde motion
 
 ```
 # Get position
@@ -271,6 +271,19 @@ ephemeris.Observer
 ephemeris.moon
 
 // => Object{luna}
+
+ephemeris.moon.orbit
+
+// => {
+  meanApogee: { // aka lilith
+    apparentLongitude: 357.0998704627402,
+    apparentLongitudeString: "357°6'0"",
+    apparentLongitude30String: "27°6'0""
+  },
+  meanAscendingNode: {...}, // aka north node
+  meanDescendingNode: {...}, // aka south node
+  meanPerigee: {...}
+}
 ```
 
 ## Installation
