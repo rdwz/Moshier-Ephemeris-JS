@@ -255,7 +255,7 @@ npm test
 
 ### Notes on precision & accuracy upgrading from 0.1.0 to 1.0.0 and beyond
 
-1) There is very tiny differences (in the magnitude of 0.0000005 degrees) between the `apparentLongitude` decimal calculation of the `Sun` in the 1.0.0 implementation vs the 0.1.0 implentation. I've tracked this down to a specific calculation - `epsilon.js`.
+1) There is a very tiny differences (in the magnitude of 0.0000005 degrees) between the `apparentLongitude` decimal calculation of the `Sun` in the 1.0.0 implementation vs the 0.1.0 implentation. I've tracked this down to a specific calculation - `epsilon.js`.
 
 I believe this upgrade actually fixed a bug in the original implementation. The bug was centered around the way `epsilon.js` was implemented. In the 0.1.0 implementation, `$moshier.epsilon` was a global variable that was reassigned frequently. This, I believe, resulted in unintentional mutations.
 
