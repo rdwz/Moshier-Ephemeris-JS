@@ -1,4 +1,4 @@
-# Moshier Ephemeris ES6 Re-implementation - The REBOOT!
+# Moshier Ephemeris ES6 Re-implementation
 
 This is a "re-implementation" of version 0.1.0 of Mivion's Moshier Ephemeris javascript implementation (found here: https://github.com/mivion/ephemeris).
 
@@ -50,6 +50,12 @@ Moshier's Ephemeris is good from -3000 B.C.E - 3000 C.E. Its results are always 
 ## Future work
 - Eclipses
 - Table generator for retrograde / eclipse events within a user-specified timeframe.
+- Add more comets & asteroids
+
+
+## Performance
+- The ephemeris is extremely fast and performs all of its calculations in under what appears to be 100ms. I haven't actually benchmarked things but hope to in the future.
+- As of 1.2.0, I introduced retrograde shadow calculations which introduce a significant performance impact (nearly 10x slowdown). I made these calculations optional and set them to be turned off by default. Calculating retrograde shadows require the ephemeris to calculate the next and previous retrograde & direct dates for each body, which I'm currently doing by brute force since I don't know if any formula exist for these sorts of calculations. If anyone knows, please reach out!
 
 ## Demo
 
@@ -246,25 +252,6 @@ npm test
 
 // or yarn test
 ```
-
-## Future work
-- Retrograde & stationary planet determinations
-- Moon phases classifications
-- Add more comets & asteroids
-- Refactoring as needed (I'm not looking to go overboard with this now as we're getting to the point of diminishing returns)
-
-## Development process notes
-
-It's essential at this stage to make sure that none of the results are different from what you get when running the legacy version with the same inputs (date, lat/lon, etc).
-
-I'm running the legacy library in a bootstrapped frontend (repo https://github.com/0xStarcat/WesternHoroscopeJS) to ensure refactored values match.
-
-Then tests are written.
-
-**I am not an astronomer**. I don't fully understand how most of these formula work. That's why I'm not touching any of them until I have some tests written.
-
-I'm also using the telnet interface that the Jet Propulsion laboratory provides here (https://ssd.jpl.nasa.gov/?horizons) to help verify my results.
-
 
 ### Notes on precision & accuracy upgrading from 0.1.0 to 1.0.0 and beyond
 
