@@ -6,6 +6,7 @@ class Demo {
     this.latitudeInput = document.querySelector('#latitude')
     this.longitudeInput = document.querySelector('#longitude')
     this.moonTable = document.querySelector('#moon')
+    this.calcShadowsCheckbox = document.querySelector('#calcShadows')
 
 
     this.handleSubmit = this.handleSubmit.bind(this)
@@ -28,7 +29,8 @@ class Demo {
       longitude: parseFloat(this.longitudeInput.value)
     }
 
-  const ephemeris = new Ephemeris.default({...origin, calculateShadows: true})
+  const showShadows = this.calcShadowsCheckbox.checked
+  const ephemeris = new Ephemeris.default({...origin, calculateShadows: showShadows})
   console.log(`EPHEMERIS: `, ephemeris)
   console.log(`EPHEMERIS RESULTS FOR ${this.dateInput.value} -- ${this.timeInput.value} UTC}`, ephemeris.Results)
 
@@ -39,8 +41,18 @@ class Demo {
     const dmsEl = document.querySelector(`#${result.key}-dms`)
     if (dmsEl) dmsEl.innerHTML = result.position.apparentLongitudeString
 
-    const retroEl = document.querySelector(`#${result.key}-r`)
-    if (retroEl) retroEl.innerHTML = result.motion.isRetrograde ? '-R' : ''
+    const retroEl = document.querySelector(`#${result.key}-motion`)
+    const isRetrograde = result.motion.isRetrograde ? 'Retrograde' : 'Direct'
+    if (retroEl) retroEl.innerHTML = isRetrograde
+    if (showShadows && retroEl) {
+      if (result.motion.withinPreRetrogradeShadow) {
+        retroEl.innerHTML = `${isRetrograde}, Pre-retrograde shadow`
+      }
+
+      if (result.motion.withinPostRetrogradeShadow) {
+        retroEl.innerHTML = `${isRetrograde}, Post-retrograde shadow`
+      }
+    }
   })
 
   const moonTableEls = this.moonTable.querySelectorAll('tbody td')

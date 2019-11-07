@@ -17,6 +17,8 @@ export default class Star {
       this[key] = this._body[key]
     })
 
+    this.motion = {}
+
     this.prepareBody = this.prepareBody.bind(this)
     this.calculateBody = this.calculateBody.bind(this)
     this.reduceBody = this.reduceBody.bind(this)

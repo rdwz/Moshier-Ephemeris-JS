@@ -23,6 +23,8 @@ export default class Luna {
       this[key] = this._body[key]
     })
 
+    this.motion = {}
+
     this.orbit = this.calculateOrbit(observer.Date.julian)
 
     this.calculateBody = this.calculateBody.bind(this)

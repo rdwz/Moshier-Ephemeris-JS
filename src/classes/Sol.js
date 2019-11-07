@@ -19,6 +19,8 @@ export default class Sol {
     })
 
     this.calculateBody = this.calculateBody.bind(this)
+
+    this.motion = {}
   }
 
   calculateBody(body, earthBody, observer) {
