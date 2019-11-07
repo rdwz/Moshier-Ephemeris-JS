@@ -2,7 +2,7 @@
 
 This is a "re-implementation" of version 0.1.0 of Mivion's Moshier Ephemeris javascript implementation (found here: https://github.com/mivion/ephemeris).
 
-The goal is to re-implement the codebase with ES6 modules, classes, refactored programming to promote better debugging / testing, readability, and extensibility of the code.
+The goal is to re-implement the codebase with ES6 modules, classes, and refactored programming to promote better debugging / testing, readability, and extensibility of the code.
 
 This amazing work done by Moshier and Mivion deserves a lot of love. Hope you enjoy it!
 
@@ -41,7 +41,7 @@ Moshier's Ephemeris is good from -3000 B.C.E - 3000 C.E. Its results are always 
 - Chiron
 - Sirius
 
-## Main features
+## Extra features
 - Thoroughly tested code & an easy to implement `Ephemeris` class for external use.
 - Moon phase descriptions
 - Lunar nodes & perigee / apogee calculations
