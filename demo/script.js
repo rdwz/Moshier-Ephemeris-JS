@@ -7,6 +7,8 @@ class Demo {
     this.longitudeInput = document.querySelector('#longitude')
     this.moonQuarterApproximationInput = document.querySelector('#moonQuarterApproximation')
     this.moonTable = document.querySelector('#moon')
+    this.moonOrbitTable = document.querySelector('#moonOrbit')
+
     this.calcShadowsCheckbox = document.querySelector('#calcShadows')
 
 
