@@ -1,5 +1,12 @@
 # Changelog
 
+## **v1.2.0**
+
+##### Added
+
+- Added `.motion` property to heliocentric bodies for reporting retrograde motion and pre/post shadow phases.
+- Added `calculateShadows` key to Ephemeris class constructor to toggle costly shadow calculations on / off.
+
 ## **v1.1.0**
 
 ##### Fixed

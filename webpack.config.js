@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
   entry: {
-    "ephemeris-1.1.0": './src/Ephemeris.js',
+    "ephemeris-1.2.0": './src/Ephemeris.js',
   },
   output: {
     filename: '[name].bundle.js',

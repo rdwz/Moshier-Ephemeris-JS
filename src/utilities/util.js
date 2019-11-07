@@ -424,3 +424,22 @@ util.attachApparentLongitudes = (object, decimalDegrees) => {
 
   return object
 }
+
+util.getModuloDifference = (n1, n2, mod) => {
+  // https://gamedev.stackexchange.com/questions/4467/comparing-angles-and-working-out-the-difference
+  // returns the difference between n1 - n2 when these numbers exist in a modular set
+  const halfMod = mod / 2
+  return halfMod - Math.abs(Math.abs(n1 - n2) - halfMod)
+}
+
+util.correctRealModuloNumber = (absDiff, n1, n2, mod) => {
+  // Applies a negative number to absDiff if n1 < n2 or n1 + mod !== the diff
+  // Use in conjunction with getModuloDifference to get the absolute difference
+  // between n1, n2
+  return (n1 >= n2) || ((n1 + mod) - n2) === absDiff ? absDiff : -absDiff
+}
+
+
+util.cloneUTCDate = utcDate => {
+  return new Date(Date.UTC(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), utcDate.getUTCDate(), utcDate.getUTCHours(), utcDate.getUTCMinutes(), utcDate.getUTCSeconds()))
+}

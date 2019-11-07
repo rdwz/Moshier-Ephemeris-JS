@@ -7,7 +7,8 @@ class Demo {
     this.longitudeInput = document.querySelector('#longitude')
     this.moonQuarterApproximationInput = document.querySelector('#moonQuarterApproximation')
     this.moonTable = document.querySelector('#moon')
-    this.moonOrbitTable = document.querySelector('#moonOrbit')
+    this.calcShadowsCheckbox = document.querySelector('#calcShadows')
+
 
     this.handleSubmit = this.handleSubmit.bind(this)
 
@@ -20,7 +21,7 @@ class Demo {
     const time = this.timeInput.value.split(':')
     const origin = {
       year: parseInt(date[0]),
-      month: parseInt(date[1]),
+      month: parseInt(date[1] - 1),
       day: parseInt(date[2]),
       hours: parseInt(time[0]),
       minutes: parseInt(time[1]),
@@ -30,7 +31,8 @@ class Demo {
       moonQuarterApproximationValue: this.moonQuarterApproximationInput.value
     }
 
-  const ephemeris = new Ephemeris.default(origin)
+  const showShadows = this.calcShadowsCheckbox.checked
+  const ephemeris = new Ephemeris.default({...origin, calculateShadows: showShadows})
   console.log(`EPHEMERIS: `, ephemeris)
   console.log(`EPHEMERIS RESULTS FOR ${this.dateInput.value} -- ${this.timeInput.value} UTC}`, ephemeris.Results)
 
@@ -40,6 +42,19 @@ class Demo {
 
     const dmsEl = document.querySelector(`#${result.key}-dms`)
     if (dmsEl) dmsEl.innerHTML = result.position.apparentLongitudeString
+
+    const retroEl = document.querySelector(`#${result.key}-motion`)
+    const isRetrograde = result.motion.isRetrograde ? 'Retrograde' : 'Direct'
+    if (retroEl) retroEl.innerHTML = isRetrograde
+    if (showShadows && retroEl) {
+      if (result.motion.withinPreRetrogradeShadow) {
+        retroEl.innerHTML = `${isRetrograde}, Pre-retrograde shadow`
+      }
+
+      if (result.motion.withinPostRetrogradeShadow) {
+        retroEl.innerHTML = `${isRetrograde}, Post-retrograde shadow`
+      }
+    }
   })
 
   const moonTableEls = this.moonTable.querySelectorAll('tbody td')

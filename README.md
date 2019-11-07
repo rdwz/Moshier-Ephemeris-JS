@@ -1,10 +1,10 @@
-# Moshier Ephemeris ES6 Re-implementation - The REBOOT!
+# Moshier Ephemeris ES6 Re-implementation
 
 This is a "re-implementation" of version 0.1.0 of Mivion's Moshier Ephemeris javascript implementation (found here: https://github.com/mivion/ephemeris).
 
-The goal is to re-implement the codebase with ES6 modules and classes, introduce object oriented programming practices, implement idempotent & pure utility functions, and implement immutable data structures to promote better refactoring, debugging / testing, readability, and extensibility of the code.
+The goal is to re-implement the codebase with ES6 modules, classes, and refactored programming to promote better debugging / testing, readability, and extensibility of the code.
 
-This amazing work done by Moshier and Mivion deserves a lot of love and cleanup. Hope you enjoy and find it helpful in your project!
+This amazing work done by Moshier and Mivion deserves a lot of love. Hope you enjoy it!
 
 ##  Description
 
@@ -16,23 +16,17 @@ Licensed under GPL version 3 (https://www.gnu.org/licenses/gpl-3.0.html).
 
 ## About Moshier's Ephemeris
 
-First, what is an ephemeris? It's a table that gives you the position of various celestial bodies at every second of every minute of every day of every year.
+An ephemeris is a table that gives you the position of various celestial bodies in the solar system for every minute of every day of every year. Before computers, they were frequently sold in gigantic books every decade or so.
 
-Wow, that must be a gigantic table! Yes, and before computers, they were frequently sold in gigantic books every decade or so.
-
-So what's Moshier's ephemeris? Well, it's a set of formula written by Stephen Moshier [(inventor of the human to dolphin translator!!)](http://www.moshier.net/catalogues/dolphins.html) that generates the apparent positions of celestial bodies, given a particular date/time/location, without all the tables!
+Moshier's ephemeris is a set of formula written by Stephen Moshier that generates the apparent positions of celestial bodies when given a particular date/time/location, without all the tables.
 
 The Jet Propulsion lab also has an ephemeris, which is only accessible via their website or a telnet connection. There's also the "Swiss Ephemeris", which is available for free until you hit a certain threshold.
 
-But both of these popular ephemeris aren't as distributable as Moshier's. They're both essentially gigantic tables - dozens of MBs large compressed. Moshier's, with its tiny size, is built for the modern web!
-
-The only problem is that it was written in C...
-
-Thankfully, years ago, Mivion translated it into Javascript! The only issue is a lot has changed with Javascript over the past few years and I had difficulty integrating it into my projects. Well, that difficulty is now a thing of the past!
+Both of these popular ephemerides aren't as distributable as Moshier's. They're both essentially gigantic tables - dozens of MBs large - or otherwise hard to readily access (see: telnet connection). Moshier's, with its tiny size, is built for the modern web and can be implemented directly into something as small as a phone, raspberry pi, or any client side app.
 
 Moshier's Ephemeris is good from -3000 B.C.E - 3000 C.E. Its results are always within less than a degree of the other leading Ephemerii, making this a highly precise library.
 
-## Celestial Bodies
+## Celestial Bodies included
 - Sun
 - Moon
 - Earth
@@ -47,9 +41,21 @@ Moshier's Ephemeris is good from -3000 B.C.E - 3000 C.E. Its results are always 
 - Chiron
 - Sirius
 
-## Other Features
-- Moon Phases
-- Moon Orbit (mean ascending / descending node, mean perigee, mean apogee)
+## Extra features
+- Thoroughly tested code & an easy to implement `Ephemeris` class for external use.
+- Moon phase descriptions
+- Lunar nodes & perigee / apogee calculations
+- Planetary & asteroid retrograde motion reporting, as well as optional shadow phase determinations.
+
+## Future work
+- Eclipses
+- Table generator for retrograde / eclipse events within a user-specified timeframe.
+- Add more comets & asteroids
+
+
+## Performance
+- The ephemeris is extremely fast and performs all of its calculations in under what appears to be 100ms. I haven't actually benchmarked things but hope to in the future.
+- As of 1.2.0, I introduced retrograde shadow calculations which introduce a significant performance impact (nearly 10x slowdown). I made these calculations optional and set them to be turned off by default. Calculating retrograde shadows require the ephemeris to calculate the next and previous retrograde & direct dates for each body, which I'm currently doing by brute force since I don't know if any formula exist for these sorts of calculations. If anyone knows, please reach out!
 
 ## Demo
 
@@ -59,15 +65,24 @@ Open the file: `/demo/index.html` in your browser.
 
 ##### Load the library
 ```
-// in node
+// With ES6 imports
 
-import Ephemeris from './build/ephemeris-1.0.0.bundle.js'
+import Ephemeris from './build/ephemeris-1.2.0.bundle.js'
 
-new Ephemeris({...date/location})
+const ephemeris = new Ephemeris({...date/location})
 
+ephemeris.Results
+```
+
+```
 // or in a browser
+<script type='text/javascript' src='./ephemeris-1.2.0.bundle.js' charset='utf-8'></script>
 
-new Ephemeris.default({...date/location})
+<script>
+  const ephemeris = new Ephemeris.default({...date/location})
+
+  ephemeris.Results
+</script>
 ```
 
 #####  Create a new ephemeris instance for all celestial bodies
@@ -76,8 +91,10 @@ new Ephemeris.default({...date/location})
 
 // January 1st, 2000, 0:00 UTC - Cambridge, MA
 
+// NOTE - months go from 0 - 11 (0 = jan)
+
 const ephemeris = new Ephemeris({
-  year: 2000, month: 0, day: 1, hours: 0, minutes: 0, latitude: 41.37, longitude: -71.1
+  year: 2000, month: 0, day: 1, hours: 0, minutes: 0, latitude: 41.37, longitude: -71.1, calculateShadows: false
 })
 ```
 
@@ -87,14 +104,18 @@ const ephemeris = new Ephemeris({
 
 const ephemeris = new Ephemeris({
   key: "jupiter",
-  year: 2000, month: 0, day: 1, hours: 0, minutes: 0, latitude: 41.37, longitude: -71.1
+  year: 2000, month: 0, day: 1, hours: 0, minutes: 0,
+  latitude: 41.37, longitude: -71.1,
+  calculateShadows: false
 })
 
 # multiple specific bodies with key: [array]
 
 const ephemeris = new Ephemeris({
   key: ["jupiter", "venus", "moon", "chiron"],
-  year: 2000, month: 0, day: 1, hours: 0, minutes: 0, latitude: 41.37, longitude: -71.1
+  year: 2000, month: 0, day: 1, hours: 0, minutes: 0,
+  latitude: 41.37, longitude: -71.1,
+  calculateShadows: false
 })
 ```
 
@@ -107,7 +128,36 @@ ephemeris.Results
 // => Array[{sun}, {moon}, {mercury}...]
 ```
 
-##### Get a specific celestial body from results
+##### Get the Body Position and Retrograde motion
+
+```
+# Get position
+
+ephemeris.mercury.position
+
+# => {
+  position: {
+    ...
+    apparentLongitude: 274.38206441358966,
+    apparentLongitude30String: "4°22'55"",
+    apparentLongitudeString: "274°22'55"",
+    ...
+  }
+}
+
+# Get motion
+
+ephemeris.mercury.motion
+
+# => {
+  isRetrograde: false,
+  oneSecondMotionAmount: 0.00000031751...,
+  withinPreRetrogradeShadow: false, // optional
+  withinPostRetrogradeShadow: false // optional
+}
+```
+
+##### complete body example
 
 ```
 # View a specific celestial body result (if generated)
@@ -192,6 +242,12 @@ ephemeris.mercury
     polar: [4.575812495945637, -0.06835690545143856, 0.4662660194309599],
     rect: [-0.06351901141088291, -0.4101381667492277, -0.21250842858566044],
     trueGeocentricDistance: 1.4340239958103242
+  },
+  motion: {
+    isRetrograde: false,
+    oneSecondMotionAmount: 0.00000031751...,
+    withinPreRetrogradeShadow: false, // optional
+    withinPostRetrogradeShadow: false // optional
   }
 }
 ```
@@ -231,15 +287,19 @@ ephemeris.moon.position
   ...
 }
 
-// Orbit
+// => Object{luna}
 
 ephemeris.moon.orbit
 
-// {
-  meanApogee: {apparentLongitude: 0.5533761908581027, ...}
-  meanAscendingNode: {apparentLongitude: 96.6023120159835, ...}
-  meanDescendingNode:{apparentLongitude: 276.6023120159835, ...}
-  meanPerigee: {apparentLongitude: 180.5533761908581, ...}
+// => {
+  meanApogee: { // aka lilith
+    apparentLongitude: 357.0998704627402,
+    apparentLongitudeString: "357°6'0"",
+    apparentLongitude30String: "27°6'0""
+  },
+  meanAscendingNode: {...}, // aka north node
+  meanDescendingNode: {...}, // aka south node
+  meanPerigee: {...}
 }
 ```
 
@@ -259,28 +319,9 @@ npm test
 // or yarn test
 ```
 
-## Future work
-- Retrograde & stationary planet determinations
-- Moon phases classifications
-- Add more comets & asteroids
-- Refactoring as needed (I'm not looking to go overboard with this now as we're getting to the point of diminishing returns)
+### Notes on precision & accuracy upgrading from 0.1.0 to 1.0.0 and beyond
 
-## Development process notes
-
-It's essential at this stage to make sure that none of the results are different from what you get when running the legacy version with the same inputs (date, lat/lon, etc).
-
-I'm running the legacy library in a bootstrapped frontend (repo https://github.com/0xStarcat/WesternHoroscopeJS) to ensure refactored values match.
-
-Then tests are written.
-
-**I am not an astronomer**. I don't fully understand how most of these formula work. That's why I'm not touching any of them until I have some tests written.
-
-I'm also using the telnet interface that the Jet Propulsion laboratory provides here (https://ssd.jpl.nasa.gov/?horizons) to help verify my results.
-
-
-### Notes on precision & accuracy upgrading from 0.1.0 to 1.0.0
-
-1) There is very tiny differences (in the magnitude of 0.0000005 degrees) between the `apparentLongitude` decimal calculation of the `Sun` in the 1.0.0 implementation vs the 0.1.0 implentation. I've tracked this down to a specific calculation - `epsilon.js`.
+1) There is a very tiny differences (in the magnitude of 0.0000005 degrees) between the `apparentLongitude` decimal calculation of the `Sun` in the 1.0.0 implementation vs the 0.1.0 implentation. I've tracked this down to a specific calculation - `epsilon.js`.
 
 I believe this upgrade actually fixed a bug in the original implementation. The bug was centered around the way `epsilon.js` was implemented. In the 0.1.0 implementation, `$moshier.epsilon` was a global variable that was reassigned frequently. This, I believe, resulted in unintentional mutations.
 
@@ -304,8 +345,8 @@ $moshier.body.sun.position.apparent = $util.showrd (ecr, pol);
 y  =  $moshier.epsilon.coseps * rec[1]  +  $moshier.epsilon.sineps * rec[2]; // utilizes $moshier.epsilon
 ```
 
-So in conclusion, this 0.0000005 difference in the Sun's `apparentLongitude` between versions 0.1.0 and 1.0.0 is a bugfix and a feature, not a bug.
+This 0.0000005 difference in the Sun's `apparentLongitude` between versions 0.1.0 and 1.0.0 is probably good.
 
 Everything else appears to be exactly the same according to my tests.
 
-2) Tiny correction (0.1*e-15 or 0.000000000000001) on moon `illuminatedFraction` and `phaseDaysPast / phaseDaysBefore` from gplan refactoring. Most likely due to the conversion differences between radians-to-seconds and seconds-to-radians constants (RTS and STR) in app. Possibly solution is using equations involving Math.PI instead.
+2) Found tiny correction (0.1*e-15 or 0.000000000000001) on moon `illuminatedFraction` and `phaseDaysPast / phaseDaysBefore` as a result of gplan refactoring. This was most likely due to the use of conversion constants for radians-to-seconds and seconds-to-radians (RTS and STR) in the app. One possible solution would be to use equations involving Math.PI instead, however this tiny difference seems unimportant and an issue with javascript's math rather than the refactor.

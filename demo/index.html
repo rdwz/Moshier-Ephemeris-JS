@@ -5,7 +5,18 @@
       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
       <script type='text/javascript' src='./script.js' charset='utf-8'></script>
-      <script type='text/javascript' src='../build/ephemeris-1.1.0.bundle.js' charset='utf-8'></script>
+      <script type='text/javascript' src='../build/ephemeris-1.2.0.bundle.js' charset='utf-8'></script>
+
+      <style>
+        .hover-underline:hover {
+          cursor: pointer;
+          text-decoration: underline;
+        }
+
+        .hover-underline:hover {
+          color: red;
+        }
+      </style>
   </head>
   <body>
     <div class="container-fluid">
@@ -35,6 +46,14 @@
             <div class="form-group">
               <label>Time (UTC)</label>
               <input class="form-control" id="time" name="time" type="time" value="00:00:00"></input>
+            </div>
+            <div class="form-group">
+              <label class="hover-underline hover-warning" for="calcShadows">Calculate retrograde shadows? (Warning: performance impact) <div>
+
+                <input type="checkbox" id="calcShadows" />
+              </div>
+            </label>
+
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
           </form>
@@ -128,7 +147,7 @@
                 </tr>
                 <tr>
                   <td>
-                    Sign - D/M/S
+                    D/M/S
                   </td>
                   <td id="sun-dms">
 
@@ -164,6 +183,47 @@
 
                   </td>
                   <td id="sirius-dms">
+
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    Motion
+                  </td>
+                  <td>
+
+                  </td>
+                  <td>
+
+                  </td>
+                  <td id="mercury-motion">
+
+                  </td>
+                  <td id="venus-motion">
+
+                  </td>
+                  <td id="mars-motion">
+
+                  </td>
+                  <td id="jupiter-motion">
+
+                  </td>
+                  <td id="saturn-motion">
+
+                  </td>
+                  <td id="uranus-motion">
+
+                  </td>
+                  <td id="neptune-motion">
+
+                  </td>
+                  <td id="pluto-motion">
+
+                  </td>
+                  <td id="chiron-motion">
+
+                  </td>
+                  <td>
 
                   </td>
                 </tr>
