@@ -22,7 +22,7 @@ Moshier's ephemeris is a set of formula written by Stephen Moshier that generate
 
 The Jet Propulsion lab also has an ephemeris, which is only accessible via their website or a telnet connection. There's also the "Swiss Ephemeris", which is available for free until you hit a certain threshold.
 
-Both of these popular ephemerides aren't as distributable as Moshier's. They're both essentially gigantic tables - dozens of MBs large - or otherwise hard to readily access (see: telnet connection). Moshier's, with its tiny size, is built for the modern web and can be implemented directly into something as small as a phone, raspberry pi, or any client side app.
+Both of these popular ephemerides aren't as distributable as Moshier's. They're both essentially gigantic tables - dozens of MBs large - or otherwise hard to readily access (see: telnet connection). Moshier's, with its tiny size, is built for the modern web and can be implemented directly into something as small as a phone, raspberry pi, or any client side app. The minified build as of 1.2.1 is 235kb in size.
 
 Moshier's Ephemeris is good from -3000 B.C.E - 3000 C.E. Its results are always within less than a degree of the other leading Ephemerii, making this a highly precise library.
 
