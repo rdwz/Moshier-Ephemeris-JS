@@ -2,9 +2,9 @@
 
 This is a "re-implementation" of version 0.1.0 of Mivion's Moshier Ephemeris javascript implementation (found here: https://github.com/mivion/ephemeris).
 
-The goal is to re-implement the codebase with ES6 modules and classes, introduce object oriented programming practices, implement idempotent & pure utility functions, and implement immutable data structures to promote better refactoring, debugging / testing, readability, and extensibility of the code.
+The goal is to re-implement the codebase with ES6 modules, classes, refactored programming to promote better debugging / testing, readability, and extensibility of the code.
 
-This amazing work done by Moshier and Mivion deserves a lot of love and cleanup. Hope you enjoy and find it helpful in your project!
+This amazing work done by Moshier and Mivion deserves a lot of love. Hope you enjoy it!
 
 ##  Description
 
@@ -16,23 +16,17 @@ Licensed under GPL version 3 (https://www.gnu.org/licenses/gpl-3.0.html).
 
 ## About Moshier's Ephemeris
 
-First, what is an ephemeris? It's a table that gives you the position of various celestial bodies at every second of every minute of every day of every year.
+An ephemeris is a table that gives you the position of various celestial bodies in the solar system for every minute of every day of every year. Before computers, they were frequently sold in gigantic books every decade or so.
 
-Wow, that must be a gigantic table! Yes, and before computers, they were frequently sold in gigantic books every decade or so.
-
-So what's Moshier's ephemeris? Well, it's a set of formula written by Stephen Moshier [(inventor of the human to dolphin translator!!)](http://www.moshier.net/catalogues/dolphins.html) that generates the apparent positions of celestial bodies, given a particular date/time/location, without all the tables!
+Moshier's ephemeris is a set of formula written by Stephen Moshier that generates the apparent positions of celestial bodies when given a particular date/time/location, without all the tables.
 
 The Jet Propulsion lab also has an ephemeris, which is only accessible via their website or a telnet connection. There's also the "Swiss Ephemeris", which is available for free until you hit a certain threshold.
 
-But both of these popular ephemeris aren't as distributable as Moshier's. They're both essentially gigantic tables - dozens of MBs large compressed. Moshier's, with its tiny size, is built for the modern web!
-
-The only problem is that it was written in C...
-
-Thankfully, years ago, Mivion translated it into Javascript! The only issue is a lot has changed with Javascript over the past few years and I had difficulty integrating it into my projects. Well, that difficulty is now a thing of the past!
+Both of these popular ephemerides aren't as distributable as Moshier's. They're both essentially gigantic tables - dozens of MBs large - or otherwise hard to readily access (see: telnet connection). Moshier's, with its tiny size, is built for the modern web and can be implemented directly into something as small as a phone, raspberry pi, or any client side app.
 
 Moshier's Ephemeris is good from -3000 B.C.E - 3000 C.E. Its results are always within less than a degree of the other leading Ephemerii, making this a highly precise library.
 
-## Celestial Bodies
+## Celestial Bodies included
 - Sun
 - Moon
 - Earth
@@ -47,6 +41,16 @@ Moshier's Ephemeris is good from -3000 B.C.E - 3000 C.E. Its results are always 
 - Chiron
 - Sirius
 
+## Main features
+- Thoroughly tested code & an easy to implement `Ephemeris` class for external use.
+- Moon phase descriptions
+- Lunar nodes & perigee / apogee calculations
+- Planetary & asteroid retrograde motion reporting, as well as optional shadow phase determinations.
+
+## Future work
+- Eclipses
+- Table generator for retrograde / eclipse events within a user-specified timeframe.
+
 ## Demo
 
 Open the file: `/demo/index.html` in your browser.
@@ -58,6 +62,8 @@ Open the file: `/demo/index.html` in your browser.
 // in node
 
 import Ephemeris from './build/ephemeris-1.0.0.bundle.js'
+
+// NOTE - months go from 0 - 11 (0 = jan)
 
 new Ephemeris({...date/location})
 
@@ -72,8 +78,10 @@ new Ephemeris.default({...date/location})
 
 // January 1st, 2000, 0:00 UTC - Cambridge, MA
 
+// NOTE - months go from 0 - 11 (0 = jan)
+
 const ephemeris = new Ephemeris({
-  year: 2000, month: 0, day: 1, hours: 0, minutes: 0, latitude: 41.37, longitude: -71.1
+  year: 2000, month: 0, day: 1, hours: 0, minutes: 0, latitude: 41.37, longitude: -71.1, calculateShadows: false
 })
 ```
 
@@ -83,14 +91,18 @@ const ephemeris = new Ephemeris({
 
 const ephemeris = new Ephemeris({
   key: "jupiter",
-  year: 2000, month: 0, day: 1, hours: 0, minutes: 0, latitude: 41.37, longitude: -71.1
+  year: 2000, month: 0, day: 1, hours: 0, minutes: 0,
+  latitude: 41.37, longitude: -71.1,
+  calculateShadows: false
 })
 
 # multiple specific bodies with key: [array]
 
 const ephemeris = new Ephemeris({
   key: ["jupiter", "venus", "moon", "chiron"],
-  year: 2000, month: 0, day: 1, hours: 0, minutes: 0, latitude: 41.37, longitude: -71.1
+  year: 2000, month: 0, day: 1, hours: 0, minutes: 0,
+  latitude: 41.37, longitude: -71.1,
+  calculateShadows: false
 })
 ```
 
@@ -188,6 +200,12 @@ ephemeris.mercury
     polar: [4.575812495945637, -0.06835690545143856, 0.4662660194309599],
     rect: [-0.06351901141088291, -0.4101381667492277, -0.21250842858566044],
     trueGeocentricDistance: 1.4340239958103242
+  },
+  motion: {
+    isRetrograde: false,
+    oneSecondMotionAmount: 0.00000031751...,
+    withinPreRetrogradeShadow: false, // optional
+    withinPostRetrogradeShadow: false // optional
   }
 }
 ```
@@ -274,8 +292,8 @@ $moshier.body.sun.position.apparent = $util.showrd (ecr, pol);
 y  =  $moshier.epsilon.coseps * rec[1]  +  $moshier.epsilon.sineps * rec[2]; // utilizes $moshier.epsilon
 ```
 
-So in conclusion, this 0.0000005 difference in the Sun's `apparentLongitude` between versions 0.1.0 and 1.0.0 is a bugfix and a feature, not a bug.
+This 0.0000005 difference in the Sun's `apparentLongitude` between versions 0.1.0 and 1.0.0 is probably good.
 
 Everything else appears to be exactly the same according to my tests.
 
-2) Tiny correction (0.1*e-15 or 0.000000000000001) on moon `illuminatedFraction` and `phaseDaysPast / phaseDaysBefore` from gplan refactoring. Most likely due to the conversion differences between radians-to-seconds and seconds-to-radians constants (RTS and STR) in app. Possibly solution is using equations involving Math.PI instead.
+2) Found tiny correction (0.1*e-15 or 0.000000000000001) on moon `illuminatedFraction` and `phaseDaysPast / phaseDaysBefore` as a result of gplan refactoring. This was most likely due to the use of conversion constants for radians-to-seconds and seconds-to-radians (RTS and STR) in the app. One possible solution would be to use equations involving Math.PI instead, however this tiny difference seems unimportant and an issue with javascript's math rather than the refactor.
