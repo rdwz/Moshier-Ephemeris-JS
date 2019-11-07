@@ -65,17 +65,24 @@ Open the file: `/demo/index.html` in your browser.
 
 ##### Load the library
 ```
-// in node
+// With ES6 imports
 
-import Ephemeris from './build/ephemeris-1.0.0.bundle.js'
+import Ephemeris from './build/ephemeris-1.2.0.bundle.js'
 
-// NOTE - months go from 0 - 11 (0 = jan)
+const ephemeris = new Ephemeris({...date/location})
 
-new Ephemeris({...date/location})
+ephemeris.Results
+```
 
+```
 // or in a browser
+<script type='text/javascript' src='./ephemeris-1.2.0.bundle.js' charset='utf-8'></script>
 
-new Ephemeris.default({...date/location})
+<script>
+  const ephemeris = new Ephemeris.default({...date/location})
+
+  ephemeris.Results
+</script>
 ```
 
 #####  Create a new ephemeris instance for all celestial bodies
@@ -121,7 +128,36 @@ ephemeris.Results
 // => Array[{sun}, {moon}, {mercury}...]
 ```
 
-##### Get a specific celestial body from results
+##### Get the body position and retrograde motion
+
+```
+# Get position
+
+ephemeris.mercury.position
+
+# => {
+  position: {
+    ...
+    apparentLongitude: 274.38206441358966,
+    apparentLongitude30String: "4°22'55"",
+    apparentLongitudeString: "274°22'55"",
+    ...
+  }
+}
+
+# Get motion
+
+ephemeris.mercury.motion
+
+# => {
+  isRetrograde: false,
+  oneSecondMotionAmount: 0.00000031751...,
+  withinPreRetrogradeShadow: false, // optional
+  withinPostRetrogradeShadow: false // optional
+}
+```
+
+##### complete body example
 
 ```
 # View a specific celestial body result (if generated)
