@@ -1,5 +1,12 @@
 # Changelog
 
+## **v1.2.1**
+
+##### Added
+
+- Properly minify the code, decreasing bundle size from 537kb to 235kb.
+
+
 ## **v1.2.0**
 
 ##### Added
